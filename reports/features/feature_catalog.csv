@@ -1,0 +1,30 @@
+Feature,Formula,Clinical Meaning,Type
+Shock_Index,HR / SBP,Hemodynamic instability & hypovolemia marker,Cardiovascular
+Pulse_Pressure,SBP - DBP,Pulse pressure indicating stroke volume status,Cardiovascular
+MAP_deviation,MAP - ((DBP*2)+SBP)/3,Deviation between recorded and estimated Mean Arterial Pressure,Cardiovascular
+HR_MAP_Ratio,HR / MAP,Circulatory and vascular stress index,Ratio
+Resp_O2Sat_Ratio,Resp / O2Sat,Respiratory efficiency and blood oxygenation balance,Ratio
+HR_Temp_Ratio,HR / Temp,Cardiovascular metabolic demand ratio (SIRS context),Ratio
+HR_roll_mean_6h,Mean(HR L6h),6-hour rolling average heart rate baseline,Rolling
+Resp_roll_mean_6h,Mean(Resp L6h),6-hour rolling average respiratory baseline,Rolling
+Temp_roll_mean_6h,Mean(Temp L6h),6-hour rolling average body temperature baseline,Rolling
+MAP_roll_mean_6h,Mean(MAP L6h),6-hour rolling average mean arterial pressure baseline,Rolling
+O2Sat_roll_mean_6h,Mean(O2Sat L6h),6-hour rolling average oxygen saturation baseline,Rolling
+HR_roll_std_6h,Std(HR L6h),Heart rate variability/instability over 6 hours,Rolling
+Resp_roll_std_6h,Std(Resp L6h),Respiration rate variability/instability over 6 hours,Rolling
+Temp_roll_std_6h,Std(Temp L6h),Temperature variability/instability over 6 hours,Rolling
+MAP_roll_std_6h,Std(MAP L6h),Mean arterial pressure variability/instability over 6 hours,Rolling
+O2Sat_roll_std_6h,Std(O2Sat L6h),Oxygen saturation variability/instability over 6 hours,Rolling
+HR_diff_1h,HR(t) - HR(t-1),1-hour heart rate velocity (slope),Trend
+Temp_diff_1h,Temp(t) - Temp(t-1),1-hour temperature velocity (slope),Trend
+Resp_diff_1h,Resp(t) - Resp(t-1),1-hour respiratory velocity (slope),Trend
+O2Sat_diff_1h,O2Sat(t) - O2Sat(t-1),1-hour oxygen saturation velocity (slope),Trend
+hours_since_last_Lactate,t - t_last(Lactate),Hours elapsed since Lactate was last measured,Sparsity
+hours_since_last_Creatinine,t - t_last(Creatinine),Hours elapsed since Creatinine was last measured,Sparsity
+hours_since_last_WBC,t - t_last(WBC),Hours elapsed since White Blood Cell count was last measured,Sparsity
+hours_since_last_Platelets,t - t_last(Platelets),Hours elapsed since Platelet count was last measured,Sparsity
+hours_since_last_BUN,t - t_last(BUN),Hours elapsed since Blood Urea Nitrogen was last measured,Sparsity
+hours_since_last_pH,t - t_last(pH),Hours elapsed since pH was last measured,Sparsity
+hours_since_last_HCO3,t - t_last(HCO3),Hours elapsed since Bicarbonate was last measured,Sparsity
+First_24h_Flag,ICULOS <= 24,Indicator flag representing patient's first 24 hours in ICU,Stay Time
+Diurnal_Proxy_Hour,ICULOS % 24,Modulo hour to proxy circadian vital trends,Stay Time
