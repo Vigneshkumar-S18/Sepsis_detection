@@ -1,0 +1,7 @@
+Experiment_ID,Model,Dataset,Window_Size,Horizon,AUROC,AUPRC,F1,Recall,Precision,Git_Tag,Notes
+EXP_001_BASELINE,Logistic Regression,68 features,6h,6h,0.0,0.0,0.0,0.0,0.0,v0.4,Placeholder for baseline LR run
+EXP_001_BASELINE,Random Forest,68 features,6h,6h,0.0,0.0,0.0,0.0,0.0,v0.4,Placeholder for baseline RF run
+EXP_001_BASELINE,XGBoost,68 features,6h,6h,0.0,0.0,0.0,0.0,0.0,v0.4,Placeholder for baseline XGB run
+EXP_002_ENGINEERED,Logistic Regression,97 features,6h,6h,0.0,0.0,0.0,0.0,0.0,v0.4,Placeholder for engineered LR run
+EXP_002_ENGINEERED,Random Forest,97 features,6h,6h,0.0,0.0,0.0,0.0,0.0,v0.4,Placeholder for engineered RF run
+EXP_002_ENGINEERED,XGBoost,97 features,6h,6h,0.0,0.0,0.0,0.0,0.0,v0.4,Placeholder for engineered XGB run
