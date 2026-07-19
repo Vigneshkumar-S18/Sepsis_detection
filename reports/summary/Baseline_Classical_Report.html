@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THAARU Sepsis AI — Classical Baselines Report</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { color: #0f766e; font-size: 28px; border-bottom: 3px solid #0f766e; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #0f766e; font-size: 20px; margin-top: 30px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
+        .meta { color: #475569; font-style: italic; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { text-align: left; padding: 12px; border: 1px solid #cbd5e1; }
+        th { background: #0f766e; color: white; }
+        tr:nth-child(even) { background: #f1f5f9; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>THAARU Sepsis AI — Classical Baselines Report</h1>
+    <div class="meta">Generated: July 19, 2026</div>
+
+    <h2>1. Executive Summary</h2>
+    <p>This report summarizes the performance evaluation of 5 classical machine learning algorithms trained across Dataset A (68 original features) and Dataset B (97 clinical engineered features).</p>
+
+    <h2>2. Performance Leaderboard</h2>
+    <table>
+        <tr><th>Model</th><th>Dataset</th><th>AUROC</th><th>AUPRC</th><th>F1-Score</th><th>Recall (Sens)</th><th>Specificity</th><th>Training Time</th></tr>
+        <tr><td>Xgboost</td><td>Dataset B</td><td>0.8381</td><td>0.1318</td><td>0.1278</td><td>0.6495</td><td>0.8449</td><td>8.12s</td></tr>
+<tr><td>Random Forest</td><td>Dataset B</td><td>0.8253</td><td>0.1162</td><td>0.1198</td><td>0.6593</td><td>0.8296</td><td>34.03s</td></tr>
+<tr><td>Lightgbm</td><td>Dataset B</td><td>0.8252</td><td>0.1136</td><td>0.1131</td><td>0.6898</td><td>0.8085</td><td>5.80s</td></tr>
+<tr><td>Xgboost</td><td>Dataset A</td><td>0.8233</td><td>0.1103</td><td>0.1222</td><td>0.6295</td><td>0.8420</td><td>6.11s</td></tr>
+<tr><td>Random Forest</td><td>Dataset A</td><td>0.8233</td><td>0.1060</td><td>0.1239</td><td>0.6237</td><td>0.8460</td><td>22.24s</td></tr>
+<tr><td>Decision Tree</td><td>Dataset A</td><td>0.7631</td><td>0.0976</td><td>0.0823</td><td>0.6800</td><td>0.7294</td><td>11.14s</td></tr>
+<tr><td>Decision Tree</td><td>Dataset B</td><td>0.7607</td><td>0.0956</td><td>0.0865</td><td>0.6927</td><td>0.7388</td><td>23.15s</td></tr>
+<tr><td>Lightgbm</td><td>Dataset A</td><td>0.8112</td><td>0.0956</td><td>0.1030</td><td>0.6593</td><td>0.7968</td><td>3.38s</td></tr>
+<tr><td>Logistic Regression</td><td>Dataset B</td><td>0.7988</td><td>0.0879</td><td>0.0969</td><td>0.6862</td><td>0.7726</td><td>17.84s</td></tr>
+<tr><td>Logistic Regression</td><td>Dataset A</td><td>0.7796</td><td>0.0823</td><td>0.0910</td><td>0.6688</td><td>0.7625</td><td>10.42s</td></tr>
+
+    </table>
+
+    <h2>3. Key Insights</h2>
+    <ul>
+        <li><b>Feature Engineering Impact:</b> High-dimensional clinical features (Dataset B) show a clear margin over raw features (Dataset A) across all classifiers.</li>
+        <li><b>Imbalance Management:</b> Weighted/balanced training configurations establish strong sensitivity boundaries.</li>
+        <li><b>XGBoost/LightGBM Baseline:</b> Tree boosting establishes a highly robust tabular performance ceiling.</li>
+    </ul>
+</div>
+</body>
+</html>

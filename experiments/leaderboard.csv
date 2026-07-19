@@ -1,15 +1,11 @@
-Experiment_ID,Model,Dataset,Window_Size,Horizon,Learning_Rate,Batch_Size,Epochs,Seed,AUROC,AUPRC,F1,Recall,Precision,Training_Time,Git_Version,Notes
-EXP_001_BASE,Logistic Regression,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline LR run
-EXP_001_BASE,Decision Tree,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline DT run
-EXP_001_BASE,Random Forest,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline RF run
-EXP_001_BASE,XGBoost,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline XGB run
-EXP_001_BASE,LightGBM,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline LGBM run
-EXP_002_ENG,Logistic Regression,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered LR run
-EXP_002_ENG,Decision Tree,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered DT run
-EXP_002_ENG,Random Forest,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered RF run
-EXP_002_ENG,XGBoost,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered XGB run
-EXP_002_ENG,LightGBM,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered LGBM run
-EXP_003_SEQ,LSTM,w12_h0 (95 features),12h,0h,0.001,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for LSTM run
-EXP_003_SEQ,BiLSTM,w12_h0 (95 features),12h,0h,0.001,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for BiLSTM run
-EXP_003_SEQ,GRU,w12_h0 (95 features),12h,0h,0.001,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for GRU run
-EXP_003_SEQ,Transformer,w12_h0 (95 features),12h,0h,0.0005,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for Transformer run
+Experiment_ID,Model,Dataset,Window_Size,Horizon,Learning_Rate,Batch_Size,Epochs,Seed,AUROC,AUPRC,F1,Recall,Specificity,Training_Time,Git_Version,Notes
+EXP_DATASET_A,Logistic Regression,Dataset A,1h,0h,N/A,N/A,N/A,42,0.7795730441319011,0.0822687390510919,0.09099461493544411,0.6688125894134478,0.7624897874041754,10.42s,v0.6,Tabular classical ML run on Dataset A
+EXP_DATASET_A,Decision Tree,Dataset A,1h,0h,N/A,N/A,N/A,42,0.7631232250098333,0.09759523083737537,0.08229455216989844,0.6800190748688603,0.729405322718028,11.14s,v0.6,Tabular classical ML run on Dataset A
+EXP_DATASET_A,Random Forest,Dataset A,1h,0h,N/A,N/A,N/A,42,0.8233054245830734,0.1059622136339442,0.1238724341217416,0.6237482117310443,0.8460418586055244,22.24s,v0.6,Tabular classical ML run on Dataset A
+EXP_DATASET_A,Xgboost,Dataset A,1h,0h,0.1,N/A,N/A,42,0.8233150197126238,0.11030679590376716,0.12221939306960487,0.6294706723891274,0.8419568202756966,6.11s,v0.6,Tabular classical ML run on Dataset A
+EXP_DATASET_A,Lightgbm,Dataset A,1h,0h,0.1,N/A,N/A,42,0.8111631782630252,0.09562789319394822,0.10296417665897073,0.6592751549833095,0.7968388756583865,3.38s,v0.6,Tabular classical ML run on Dataset A
+EXP_DATASET_B,Logistic Regression,Dataset B,1h,0h,N/A,N/A,N/A,42,0.798832271075814,0.0879230283941724,0.09690072557701049,0.6862184072484502,0.7725893928068559,17.84s,v0.6,Tabular classical ML run on Dataset B
+EXP_DATASET_B,Decision Tree,Dataset B,1h,0h,N/A,N/A,N/A,42,0.7606873749581576,0.09564705468085398,0.08645833333333333,0.6926561754887935,0.7388139482330036,23.15s,v0.6,Tabular classical ML run on Dataset B
+EXP_DATASET_B,Random Forest,Dataset B,1h,0h,N/A,N/A,N/A,42,0.8252564128436998,0.11622594913709769,0.11979031279785114,0.6592751549833095,0.8296234811479827,34.03s,v0.6,Tabular classical ML run on Dataset B
+EXP_DATASET_B,Xgboost,Dataset B,1h,0h,0.1,N/A,N/A,42,0.838052823699902,0.13176315273987194,0.12784530905336275,0.6494992846924177,0.8448728423175205,8.12s,v0.6,Tabular classical ML run on Dataset B
+EXP_DATASET_B,Lightgbm,Dataset B,1h,0h,0.1,N/A,N/A,42,0.8251550339792344,0.11359602332952937,0.11313376219619498,0.689794945159752,0.8085420758947972,5.80s,v0.6,Tabular classical ML run on Dataset B
