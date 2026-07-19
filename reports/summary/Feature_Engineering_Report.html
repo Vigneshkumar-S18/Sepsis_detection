@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THAARU Sepsis AI — Clinical Feature Engineering Report</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { color: #0f766e; font-size: 28px; border-bottom: 3px solid #0f766e; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #0f766e; font-size: 20px; margin-top: 30px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
+        .meta { color: #475569; font-style: italic; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { text-align: left; padding: 12px; border: 1px solid #cbd5e1; }
+        th { background-color: #0f766e; color: white; }
+        tr:nth-child(even) { background-color: #f1f5f9; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>THAARU Sepsis AI — Clinical Feature Engineering Report</h1>
+        <div class="meta">Derived Features & Scaling Verification Report &bull; Generated: July 19, 2026</div>
+        
+        <h2>1. Executive Summary</h2>
+        <p>This report documents Phase 4 clinical feature engineering. The final dataset combines original clinical measurements, missingness indicators, and derived clinical features.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Dataset Partition</th>
+                    <th>Rows (Hourly Records)</th>
+                    <th>Original Columns</th>
+                    <th>Engineered Columns</th>
+                    <th>Final Columns</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Training Split</td><td>1,086,436</td><td>68</td><td>29</td><td>97</td></tr>
+                <tr><td>Validation Split</td><td>231,472</td><td>68</td><td>29</td><td>97</td></tr>
+                <tr><td>Testing Split</td><td>234,302</td><td>68</td><td>29</td><td>97</td></tr>
+            </tbody>
+        </table>
+
+        <h2>2. Derived Feature Groups</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature Group</th>
+                    <th>Features Added</th>
+                    <th>Clinical Significance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Cardiovascular Indices</td><td>Shock Index, Pulse Pressure, MAP deviation</td><td> hemodynamic shock and volume status indicators</td></tr>
+                <tr><td>Clinical Ratios</td><td>HR/MAP, Resp/O2Sat, HR/Temp</td><td>Physiological distress and systemic inflammatory response</td></tr>
+                <tr><td>6h Rolling Statistics</td><td>6h Mean, 6h Std/Variability</td><td>Vital signs instability and deterioration cycles</td></tr>
+                <tr><td>1h Lag Differences</td><td>1h Slopes/Differences</td><td>Tracks acute worsening trends and rate of change</td></tr>
+                <tr><td>Sparsity Indicators</td><td>Hours since Last Lab Measurements</td><td>Tracks density of clinician test ordering patterns</td></tr>
+                <tr><td>ICU Timeline Flags</td><td>First 24 Hours, Diurnal proxy hour of stay</td><td>Diurnal biological cycle controls</td></tr>
+            </tbody>
+        </table>
+
+        <h2>3. Scale Statistics of Derived Features (Train Set Fit)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature Name</th>
+                    <th>Mean</th>
+                    <th>Standard Deviation (Scale)</th>
+                    <th>Variance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Shock_Index</td>
+                    <td>0.706</td>
+                    <td>0.199</td>
+                    <td>0.0396</td>
+                </tr>
+                <tr>
+                    <td>Pulse_Pressure</td>
+                    <td>60.0088</td>
+                    <td>19.573</td>
+                    <td>383.1012</td>
+                </tr>
+                <tr>
+                    <td>MAP_deviation</td>
+                    <td>-1.1233</td>
+                    <td>7.2356</td>
+                    <td>52.3541</td>
+                </tr>
+                <tr>
+                    <td>HR_MAP_Ratio</td>
+                    <td>1.0569</td>
+                    <td>0.2851</td>
+                    <td>0.0813</td>
+                </tr>
+                <tr>
+                    <td>Resp_O2Sat_Ratio</td>
+                    <td>0.1928</td>
+                    <td>0.0516</td>
+                    <td>0.0027</td>
+                </tr>
+                <tr>
+                    <td>HR_Temp_Ratio</td>
+                    <td>2.2858</td>
+                    <td>0.4564</td>
+                    <td>0.2083</td>
+                </tr>
+                <tr>
+                    <td>HR_roll_mean_6h</td>
+                    <td>84.3492</td>
+                    <td>15.7513</td>
+                    <td>248.1026</td>
+                </tr>
+                <tr>
+                    <td>Resp_roll_mean_6h</td>
+                    <td>18.6217</td>
+                    <td>3.9957</td>
+                    <td>15.9654</td>
+                </tr>
+                <tr>
+                    <td>Temp_roll_mean_6h</td>
+                    <td>36.8701</td>
+                    <td>0.6087</td>
+                    <td>0.3705</td>
+                </tr>
+                <tr>
+                    <td>MAP_roll_mean_6h</td>
+                    <td>82.4139</td>
+                    <td>13.4285</td>
+                    <td>180.325</td>
+                </tr>
+                <tr>
+                    <td>O2Sat_roll_mean_6h</td>
+                    <td>97.289</td>
+                    <td>2.1905</td>
+                    <td>4.7981</td>
+                </tr>
+                <tr>
+                    <td>HR_roll_std_6h</td>
+                    <td>5.3448</td>
+                    <td>4.274</td>
+                    <td>18.2669</td>
+                </tr>
+                <tr>
+                    <td>Resp_roll_std_6h</td>
+                    <td>2.3981</td>
+                    <td>1.7479</td>
+                    <td>3.0551</td>
+                </tr>
+                <tr>
+                    <td>Temp_roll_std_6h</td>
+                    <td>0.2087</td>
+                    <td>0.2123</td>
+                    <td>0.0451</td>
+                </tr>
+                <tr>
+                    <td>MAP_roll_std_6h</td>
+                    <td>7.1337</td>
+                    <td>4.7162</td>
+                    <td>22.2427</td>
+                </tr>
+                <tr>
+                    <td>O2Sat_roll_std_6h</td>
+                    <td>1.2594</td>
+                    <td>1.2105</td>
+                    <td>1.4652</td>
+                </tr>
+                <tr>
+                    <td>HR_diff_1h</td>
+                    <td>0.0087</td>
+                    <td>7.6761</td>
+                    <td>58.9223</td>
+                </tr>
+                <tr>
+                    <td>Temp_diff_1h</td>
+                    <td>0.0028</td>
+                    <td>0.2838</td>
+                    <td>0.0806</td>
+                </tr>
+                <tr>
+                    <td>Resp_diff_1h</td>
+                    <td>0.0361</td>
+                    <td>3.7439</td>
+                    <td>14.017</td>
+                </tr>
+                <tr>
+                    <td>O2Sat_diff_1h</td>
+                    <td>-0.0348</td>
+                    <td>2.2094</td>
+                    <td>4.8813</td>
+                </tr>
+                <tr>
+                    <td>hours_since_last_Lactate</td>
+                    <td>706.7053</td>
+                    <td>449.1703</td>
+                    <td>201753.9354</td>
+                </tr>
+                <tr>
+                    <td>hours_since_last_Creatinine</td>
+                    <td>220.1617</td>
+                    <td>406.3733</td>
+                    <td>165139.2294</td>
+                </tr>
+                <tr>
+                    <td>hours_since_last_WBC</td>
+                    <td>232.1916</td>
+                    <td>414.1849</td>
+                    <td>171549.1542</td>
+                </tr>
+                <tr>
+                    <td>hours_since_last_Platelets</td>
+                    <td>230.0279</td>
+                    <td>412.7606</td>
+                    <td>170371.3112</td>
+                </tr>
+                <tr>
+                    <td>hours_since_last_BUN</td>
+                    <td>211.6854</td>
+                    <td>400.4394</td>
+                    <td>160351.7196</td>
+                </tr>
+                <tr>
+                    <td>hours_since_last_pH</td>
+                    <td>549.8429</td>
+                    <td>492.2981</td>
+                    <td>242357.3933</td>
+                </tr>
+                <tr>
+                    <td>hours_since_last_HCO3</td>
+                    <td>567.8827</td>
+                    <td>491.269</td>
+                    <td>241345.2427</td>
+                </tr>
+                <tr>
+                    <td>Diurnal_Proxy_Hour</td>
+                    <td>10.7376</td>
+                    <td>6.6322</td>
+                    <td>43.9867</td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        <h2>4. Conclusion</h2>
+        <p>The feature engineering stage is stable and complete. Processed splits now contain a comprehensive set of 97 features, ready for Phase 5 sequence formatting.</p>
+    </div>
+</body>
+</html>
