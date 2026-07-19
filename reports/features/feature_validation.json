@@ -1,0 +1,33 @@
+{
+  "Shock_Index": {
+    "mean": 0.7059879311333812,
+    "std": 0.19902901336015827,
+    "min": 0.18867924528301883,
+    "max": 2.4193548387096775,
+    "anomalous_count": 2216,
+    "anomalous_pct": 0.20396967699892124
+  },
+  "Pulse_Pressure": {
+    "mean": 60.00883041430882,
+    "std": 19.572979105792626,
+    "min": -52.0,
+    "max": 170.0,
+    "anomalous_count": 11726,
+    "anomalous_pct": 1.0793088594266023
+  },
+  "MAP_deviation": {
+    "mean_abs": 4.849749112388273,
+    "std_abs": 5.4859739830368905,
+    "max_abs": 106.0,
+    "anomalous_count": 5835,
+    "anomalous_pct": 0.5370771955273942
+  },
+  "Resp_O2Sat_Ratio": {
+    "mean": 0.19276756892191474,
+    "std": 0.051616883176465934,
+    "min": 0.05000000000000002,
+    "max": 0.6056338028169014,
+    "anomalous_count": 0,
+    "anomalous_pct": 0.0
+  }
+}
