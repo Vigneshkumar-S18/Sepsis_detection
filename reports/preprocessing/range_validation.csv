@@ -1,0 +1,9 @@
+Feature,AcceptableRange,Train_Invalid_Count,Val_Invalid_Count,Test_Invalid_Count
+HR,20 - 250,0,4,0
+Temp,25 - 45,5,0,1
+Resp,4 - 80,1333,288,216
+O2Sat,0 - 100,0,0,0
+SBP,40 - 300,63,27,24
+MAP,20 - 200,286,85,73
+DBP,20 - 200,55,20,28
+pH,6.8 - 8.0,8,1,2

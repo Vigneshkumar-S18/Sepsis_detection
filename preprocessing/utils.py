@@ -51,3 +51,21 @@ def validate_columns(df, expected_columns):
     if missing:
         raise ValueError(f"Missing expected columns in data: {missing}")
     return True
+
+def get_paths():
+    """
+    Returns absolute paths to key project directories.
+    """
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    paths = {
+        "raw": os.path.join(base_dir, "datasets", "raw"),
+        "interim": os.path.join(base_dir, "datasets", "interim"),
+        "processed": os.path.join(base_dir, "datasets", "processed"),
+        "figures": os.path.join(base_dir, "reports", "figures"),
+        "tables": os.path.join(base_dir, "reports", "tables"),
+        "summary": os.path.join(base_dir, "reports", "summary")
+    }
+    # Create directories if they do not exist
+    for p in paths.values():
+        os.makedirs(p, exist_ok=True)
+    return paths

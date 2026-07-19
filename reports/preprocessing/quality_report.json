@@ -1,0 +1,35 @@
+{
+  "qa_passed": true,
+  "null_values_count": {
+    "train": 0,
+    "val": 0,
+    "test": 0
+  },
+  "duplicate_rows_count": {
+    "train": 0,
+    "val": 0,
+    "test": 0
+  },
+  "leakage_checks": {
+    "has_leakage": false,
+    "train_vs_val_overlap_count": 0,
+    "train_vs_test_overlap_count": 0,
+    "val_vs_test_overlap_count": 0,
+    "leakage_patients": {
+      "train_val": [],
+      "train_test": [],
+      "val_test": []
+    }
+  },
+  "schema_checks": {
+    "columns_match_exactly": true,
+    "train_columns_count": 68,
+    "val_columns_count": 68,
+    "test_columns_count": 68
+  },
+  "dataset_shapes": {
+    "train_rows": 1086436,
+    "val_rows": 231472,
+    "test_rows": 234302
+  }
+}

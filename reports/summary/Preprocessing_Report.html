@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THAARU Sepsis AI — Preprocessing Report</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; color: #1e293b; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { color: #0f766e; font-size: 28px; border-bottom: 3px solid #0f766e; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #0f766e; font-size: 20px; margin-top: 30px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
+        .meta { color: #475569; font-style: italic; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { text-align: left; padding: 12px; border: 1px solid #cbd5e1; }
+        th { background-color: #0f766e; color: white; }
+        tr:nth-child(even) { background-color: #f1f5f9; }
+        .full-img img { display: block; margin: 0 auto; max-width: 90%; height: auto; border: 1px solid #cbd5e1; padding: 10px; border-radius: 4px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>THAARU Sepsis AI — Preprocessing Pipeline</h1>
+        <div class="meta">Data Preprocessing & QA Summary Report &bull; Generated: July 19, 2026</div>
+        
+        <h2>1. Executive Summary & Pipeline Setup</h2>
+        <p>This report documents the dataset preprocessing pipeline, verifying that range validations, time-series imputations, winsorizations, and scaling parameters are correctly executed.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Split</th>
+                    <th>Patients Count</th>
+                    <th>Total Hour Records</th>
+                    <th>Sepsis Ratio (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Training Split</td><td>28,235</td><td>1,086,436</td><td>7.27%</td></tr>
+                <tr><td>Validation Split</td><td>6,050</td><td>231,472</td><td>7.27%</td></tr>
+                <tr><td>Testing Split</td><td>6,051</td><td>234,302</td><td>7.27%</td></tr>
+            </tbody>
+        </table>
+
+        <h2>2. Preprocessing Strategy</h2>
+        <ul>
+            <li><strong>Patient-wise Stratified Split:</strong> Cohorts partitioned strictly to prevent leakage.</li>
+            <li><strong>Range Validation:</strong> Invalid entries outside clinical ranges replaced with NaN.</li>
+            <li><strong>Adaptive Imputation:</strong> Forward-fill applied per patient (limit=6h for vitals, unlimited for labs) + Train Medians.</li>
+            <li><strong>Features Scaling:</strong> StandardScaler parameters fit on Train split and applied across all partitions.</li>
+        </ul>
+
+        <h2>3. Clinical Range Validation Replacements</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Physiological Range Limit</th>
+                    <th>Train Replaces</th>
+                    <th>Val Replaces</th>
+                    <th>Test Replaces</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>HR</td>
+                    <td>20 - 250</td>
+                    <td>0</td>
+                    <td>4</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Temp</td>
+                    <td>25 - 45</td>
+                    <td>5</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Resp</td>
+                    <td>4 - 80</td>
+                    <td>1,333</td>
+                    <td>288</td>
+                    <td>216</td>
+                </tr>
+                <tr>
+                    <td>SBP</td>
+                    <td>40 - 300</td>
+                    <td>63</td>
+                    <td>27</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <td>MAP</td>
+                    <td>20 - 200</td>
+                    <td>286</td>
+                    <td>85</td>
+                    <td>73</td>
+                </tr>
+                <tr>
+                    <td>DBP</td>
+                    <td>20 - 200</td>
+                    <td>55</td>
+                    <td>20</td>
+                    <td>28</td>
+                </tr>
+                <tr>
+                    <td>pH</td>
+                    <td>6.8 - 8.0</td>
+                    <td>8</td>
+                    <td>1</td>
+                    <td>2</td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        <h2>4. Post-Clipping Vital Distributions</h2>
+        <div class="full-img">
+            <img src="../preprocessing/boxplots.png" alt="Outliers Boxplots">
+        </div>
+
+        <h2>5. Quality Assurance Checklist</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Verification Step</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Null Values Check</td><td>PASSED</td><td>0 missing values in train, val, and test splits</td></tr>
+                <tr><td>Duplicate Records Check</td><td>PASSED</td><td>0 duplicate records in all partitions</td></tr>
+                <tr><td>Patient Leakage Check</td><td>PASSED</td><td>Overlaps: Train/Val: 0, Train/Test: 0, Val/Test: 0 (0 overlap)</td></tr>
+                <tr><td>Schema Symmetrics</td><td>PASSED</td><td>All splits share exactly 68 columns</td></tr>
+            </tbody>
+        </table>
+
+        <h2>6. Conclusion</h2>
+        <p>The preprocessing foundation is stable, leak-proof, and fully reproducible. Processed datasets are stored in Parquet format and ready for sequence formatting and LSTM training.</p>
+    </div>
+</body>
+</html>
