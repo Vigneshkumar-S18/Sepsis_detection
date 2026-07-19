@@ -1,0 +1,13 @@
+metric,value
+Total Patients,40336.0
+Septic Patients Count,2932.0
+Non-Septic Patients Count,37404.0
+Septic Patients %,7.27
+Records per Patient (Mean),38.48
+Records per Patient (Median),38.0
+Records per Patient (Min),8.0
+Records per Patient (Max),336.0
+Stay Length (Mean Hours),39.01
+Stay Length (Median Hours),39.0
+Stay Length (Min Hours),8.0
+Stay Length (Max Hours),336.0

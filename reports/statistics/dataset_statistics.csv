@@ -1,0 +1,11 @@
+Metric,Value
+unique_patients,40336.0
+total_records,1552210.0
+num_features,40.0
+duplicate_rows,0.0
+memory_usage_mb,580.28
+stay_length_avg_hours,39.01
+stay_length_median_hours,39.0
+stay_length_max_hours,336.0
+stay_length_min_hours,8.0
+size_mb,141.5

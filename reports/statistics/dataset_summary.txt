@@ -1,0 +1,14 @@
+========================================
+      PHYSIONET CHALLENGE 2019 STATISTICS
+========================================
+Unique Patients               : 40336
+Total Records                 : 1552210
+Num Features                  : 40
+Duplicate Rows                : 0
+Memory Usage Mb               : 580.28
+Stay Length Avg Hours         : 39.01
+Stay Length Median Hours      : 39.0
+Stay Length Max Hours         : 336
+Stay Length Min Hours         : 8
+Size Mb                       : 141.5
+========================================

@@ -1,0 +1,12 @@
+{
+  "unique_patients": 40336,
+  "total_records": 1552210,
+  "num_features": 40,
+  "duplicate_rows": 0,
+  "memory_usage_mb": 580.28,
+  "stay_length_avg_hours": 39.01,
+  "stay_length_median_hours": 39.0,
+  "stay_length_max_hours": 336,
+  "stay_length_min_hours": 8,
+  "size_mb": 141.5
+}

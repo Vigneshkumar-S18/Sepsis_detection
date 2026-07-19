@@ -1,0 +1,7 @@
+Vital,Total_Non_Null,IQR_Lower_Bound,IQR_Upper_Bound,IQR_Outlier_Count,IQR_Outlier_Pct,Clinical_Range,Clinical_Outlier_Count,Clinical_Outlier_Pct
+HR,1398811,36.75,130.75,14032,1.0,20 - 250,4,0.0
+Temp,525226,35.0,39.0,6569,1.25,25 - 45,6,0.0
+Resp,1313875,5.25,31.25,27855,2.12,3 - 70,1324,0.1
+SBP,1325945,60.5,184.5,15842,1.19,30 - 280,56,0.0
+MAP,1358940,39.5,123.5,21894,1.61,20 - 200,444,0.03
+DBP,1065656,27.0,99.0,16296,1.53,10 - 150,374,0.04

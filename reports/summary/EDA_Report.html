@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THAARU Sepsis AI — EDA Research Report</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        h1 {
+            color: #0f766e;
+            font-size: 28px;
+            border-bottom: 3px solid #0f766e;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h2 {
+            color: #0f766e;
+            font-size: 20px;
+            margin-top: 30px;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 5px;
+        }
+        .meta {
+            color: #475569;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+        }
+        th {
+            background-color: #0f766e;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .img-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 10px;
+            text-align: center;
+        }
+        .img-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 2px;
+        }
+        .full-img img {
+            display: block;
+            margin: 0 auto;
+            max-width: 80%;
+            height: auto;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>THAARU Sepsis AI — Clinical Intelligence</h1>
+        <div class="meta">Exploratory Data Analysis (EDA) Research Report &bull; Generated: July 19, 2026</div>
+        
+        <h2>1. Executive Summary & Dataset Overview</h2>
+        <p>This report documents the dataset statistics and patient clinical features for the consolidated PhysioNet Challenge 2019 dataset.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Metadata Parameter</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Dataset Source</td><td>PhysioNet Challenge 2019</td></tr>
+                <tr><td>Unique Patients Cohort</td><td>40,336</td></tr>
+                <tr><td>Total Hourly Records</td><td>1,552,210</td></tr>
+                <tr><td>Features (Vitals & Labs)</td><td>40</td></tr>
+                <tr><td>Stay Length (Mean / Median)</td><td>39.01h / 39.0h</td></tr>
+                <tr><td>Stay Length (Min / Max Range)</td><td>8h - 336h</td></tr>
+                <tr><td>Derived CSV Size</td><td>141.5 MB</td></tr>
+                <tr><td>Derived Parquet Size</td><td>15.7 MB (9x compressed)</td></tr>
+            </tbody>
+        </table>
+
+        <h2>2. Cohort Sepsis & Class Distribution</h2>
+        <p>Due to the acute nature of Sepsis in the ICU, the dataset exhibits extreme class imbalance at the hourly level. However, a significant fraction of the patients eventually contract sepsis.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Class Label</th>
+                    <th>Count</th>
+                    <th>Ratio (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Hourly Records</td><td>Non-Sepsis (0)</td><td>1,524,317</td><td>98.20%</td></tr>
+                <tr><td>Hourly Records</td><td>Sepsis (1)</td><td>27,893</td><td>1.80%</td></tr>
+                <tr><td>Patient Level</td><td>Never Septic</td><td>37,404</td><td>92.73%</td></tr>
+                <tr><td>Patient Level</td><td>Sepsis (Ever Septic)</td><td>2,932</td><td>7.27%</td></tr>
+            </tbody>
+        </table>
+
+        <div class="grid">
+            <div class="img-card">
+                <h3>Hourly Label Distribution</h3>
+                <img src="../figures/class_distribution.png" alt="Class Distribution">
+            </div>
+            <div class="img-card">
+                <h3>Patient-Level Distribution</h3>
+                <img src="../figures/patient_distribution.png" alt="Patient Distribution">
+            </div>
+        </div>
+
+        <h2>3. Patient ICU Stay Lengths</h2>
+        <p>The duration of ICU stay varies from 8 hours to over 300 hours. The histogram below outlines the right-skewed distribution of stay durations:</p>
+        <div class="img-card full-img">
+            <img src="../figures/patient_stay_histogram.png" alt="Stay Histogram">
+        </div>
+
+        <h2>4. Missing Data & Heatmap</h2>
+        <p>Laboratory results are sparse since clinicians order tests only when clinically indicated. The vital signs are measured much more regularly.</p>
+        <div class="img-card full-img">
+            <img src="../figures/missing_heatmap.png" alt="Missing Heatmap" style="margin-bottom: 20px;">
+            <img src="../figures/missing_bar.png" alt="Missing Bar Chart">
+        </div>
+
+        <h2>5. Feature Correlations</h2>
+        <p>Highly correlated clinical parameter clusters include Systolic/Mean/Diastolic blood pressures (SBP, MAP, DBP) and hematology measures (Hgb, Hct).</p>
+        <div class="img-card full-img">
+            <img src="../figures/correlation_heatmap.png" alt="Correlation Matrix Heatmap">
+        </div>
+
+        <h2>6. Physiological Trajectories Leading to Sepsis (12 Hours Prior)</h2>
+        <p>Aligning septic patient timelines by their diagnostic hour reveals a clear temporal degradation. Heart Rate and Respiration increase steadily, while Oxygen Saturation declines prior to onset, demonstrating the clinical value of time-series LSTM modeling.</p>
+        <div class="img-card full-img">
+            <img src="../figures/temporal_trends.png" alt="Temporal Trends">
+        </div>
+
+        <h2>7. Pipeline Preprocessing Conclusions</h2>
+        <ul>
+            <li><strong>Imputation:</strong> Carry-forward (forward-fill) should be used for missing vital values up to a 6-hour threshold. Global mean imputation must be avoided to prevent variance dilution.</li>
+            <li><strong>Robust Scaling:</strong> Outliers in blood pressure and heart rate require robust normalization strategies.</li>
+            <li><strong>Class Weighted Loss:</strong> Models must incorporate Focal Loss or class weighting to counter the 98.20% class imbalance at the hourly sequence level.</li>
+        </ul>
+    </div>
+</body>
+</html>

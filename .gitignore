@@ -1,0 +1,6 @@
+# Ignore clinical datasets
+datasets/
+# Ignore python virtual environments and cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

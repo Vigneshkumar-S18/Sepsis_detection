@@ -1,0 +1,5 @@
+Level,Class,Count,Percentage
+Hourly Record,Sepsis (1),27916,1.8
+Hourly Record,Non-Sepsis (0),1524294,98.2
+Patient,Sepsis (Ever),2932,7.27
+Patient,Non-Sepsis (Never),37404,92.73
