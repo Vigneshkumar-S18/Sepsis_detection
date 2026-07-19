@@ -1,0 +1,26 @@
+{
+    "LSTM": {
+        "trainable_parameters": 74561,
+        "model_size_mb": 0.2885,
+        "inference_time_batch_ms": 30.07,
+        "inference_time_sample_us": 29.37
+    },
+    "GRU": {
+        "trainable_parameters": 55937,
+        "model_size_mb": 0.2173,
+        "inference_time_batch_ms": 56.08,
+        "inference_time_sample_us": 54.76
+    },
+    "BiLSTM": {
+        "trainable_parameters": 181889,
+        "model_size_mb": 0.7,
+        "inference_time_batch_ms": 62.26,
+        "inference_time_sample_us": 60.8
+    },
+    "Transformer": {
+        "trainable_parameters": 73153,
+        "model_size_mb": 0.3146,
+        "inference_time_batch_ms": 27.44,
+        "inference_time_sample_us": 26.8
+    }
+}
