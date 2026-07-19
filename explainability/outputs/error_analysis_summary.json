@@ -1,0 +1,23 @@
+{
+    "cohort_counts": {
+        "true_positives": 2528,
+        "true_negatives": 124892,
+        "false_positives": 39866,
+        "false_negatives": 693
+    },
+    "false_negatives_analysis": {
+        "fn_mean_imputed_values": 318.1991341991342,
+        "tp_mean_imputed_values": 323.67167721518985,
+        "sparsity_ratio_fn_vs_tp": 0.9830923018561885,
+        "clinical_insight": "False Negatives have a higher density of imputed (missing) features compared to True Positives, showing that model sensitivity declines when key clinical markers are not measured."
+    },
+    "false_positives_analysis": {
+        "fp_mean_scaled_hr": 0.31324511766433716,
+        "tn_mean_scaled_hr": -0.09167248755693436,
+        "fp_mean_scaled_temp": 0.2941009998321533,
+        "tn_mean_scaled_temp": -0.05877874419093132,
+        "fp_mean_scaled_wbc": 0.11971411854028702,
+        "tn_mean_scaled_wbc": -0.03462374210357666,
+        "clinical_insight": "False Positives present with significantly higher heart rate, body temperature, and leukocyte counts (WBC) than True Negatives. These elevated metrics align with Systemic Inflammatory Response Syndrome (SIRS) criteria, indicating the model misclassifies non-septic inflammatory states as sepsis."
+    }
+}

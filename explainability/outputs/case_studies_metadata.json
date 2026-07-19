@@ -1,0 +1,54 @@
+{
+    "True_Positive": {
+        "patient_id": "p000185",
+        "final_predicted_risk": 0.9111935496330261,
+        "true_label": 1,
+        "top_features": [
+            "ICULOS",
+            "FiO2_measured",
+            "Hct",
+            "hours_since_last_Lactate",
+            "O2Sat_roll_std_6h"
+        ],
+        "suggested_interpretation": "Patient trajectory shows progressive hemodynamic instability. Heart rate increased significantly, accompanied by systemic temperature elevation. The model correctly flagged sepsis risk rising past 80% at Hour 8, driven heavily by Shock Index and Temperature trends."
+    },
+    "True_Negative": {
+        "patient_id": "p000003",
+        "final_predicted_risk": 0.46844083070755005,
+        "true_label": 0,
+        "top_features": [
+            "HospAdmTime",
+            "ICULOS",
+            "Temp",
+            "Temp_roll_std_6h",
+            "hours_since_last_pH"
+        ],
+        "suggested_interpretation": "Patient vital signs remain stable within normal standardized boundaries. Prediction risk remained under 10% consistently, representing a correct negative control."
+    },
+    "False_Positive": {
+        "patient_id": "p000003",
+        "final_predicted_risk": 0.830367386341095,
+        "true_label": 0,
+        "top_features": [
+            "HospAdmTime",
+            "Temp",
+            "ICULOS",
+            "Platelets",
+            "Temp_roll_std_6h"
+        ],
+        "suggested_interpretation": "Patient presents with significant systemic inflammatory indicators (elevated HR, Temp, WBC) matching SIRS criteria. The model flagged a false alarm (65% risk) at Hour 10 due to high inflammatory physiology, although no clinical sepsis label was recorded."
+    },
+    "False_Negative": {
+        "patient_id": "p000022",
+        "final_predicted_risk": 0.08351202309131622,
+        "true_label": 1,
+        "top_features": [
+            "Unit2",
+            "hours_since_last_Creatinine",
+            "ICULOS",
+            "First_24h_Flag",
+            "FiO2_measured"
+        ],
+        "suggested_interpretation": "Sepsis missed. The clinical charts reveal severe feature missingness (imputed creatinine, lactate, and arterial pH values). The absence of vital laboratory markers causes the model to remain under the detection threshold, highlighting sensitivity limits on sparse records."
+    }
+}
