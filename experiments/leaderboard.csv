@@ -1,0 +1,15 @@
+Experiment_ID,Model,Dataset,Window_Size,Horizon,Learning_Rate,Batch_Size,Epochs,Seed,AUROC,AUPRC,F1,Recall,Precision,Training_Time,Git_Version,Notes
+EXP_001_BASE,Logistic Regression,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline LR run
+EXP_001_BASE,Decision Tree,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline DT run
+EXP_001_BASE,Random Forest,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline RF run
+EXP_001_BASE,XGBoost,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline XGB run
+EXP_001_BASE,LightGBM,Dataset A (68 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for baseline LGBM run
+EXP_002_ENG,Logistic Regression,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered LR run
+EXP_002_ENG,Decision Tree,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered DT run
+EXP_002_ENG,Random Forest,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered RF run
+EXP_002_ENG,XGBoost,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered XGB run
+EXP_002_ENG,LightGBM,Dataset B (97 features),1h,0h,N/A,N/A,N/A,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for engineered LGBM run
+EXP_003_SEQ,LSTM,w12_h0 (95 features),12h,0h,0.001,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for LSTM run
+EXP_003_SEQ,BiLSTM,w12_h0 (95 features),12h,0h,0.001,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for BiLSTM run
+EXP_003_SEQ,GRU,w12_h0 (95 features),12h,0h,0.001,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for GRU run
+EXP_003_SEQ,Transformer,w12_h0 (95 features),12h,0h,0.0005,128,30,42,0.0,0.0,0.0,0.0,0.0,0.0s,v0.5,Placeholder for Transformer run

@@ -1,0 +1,50 @@
+# Classical ML Baselines on Original 68 Features (Dataset A)
+experiment_id: "baseline_classical"
+description: "Classical ML models trained on 68 original clinical features"
+dataset: "Dataset A (68 columns)"
+features_path: "datasets/processed/"
+train_file: "train_processed.parquet"
+validation_file: "validation_processed.parquet"
+test_file: "test_processed.parquet"
+window_size_hours: 1
+prediction_horizon_hours: 0
+seed: 42
+
+models:
+  - logistic_regression
+  - decision_tree
+  - random_forest
+  - xgboost
+  - lightgbm
+
+hyperparameters:
+  logistic_regression:
+    penalty: "l2"
+    C: 1.0
+    solver: "saga"
+    class_weight: "balanced"
+    max_iter: 1000
+  decision_tree:
+    max_depth: 8
+    class_weight: "balanced"
+    random_state: 42
+  random_forest:
+    n_estimators: 100
+    max_depth: 8
+    class_weight: "balanced"
+    n_jobs: -1
+    random_state: 42
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    scale_pos_weight: 54.5 # Imbalance scaling
+    learning_rate: 0.1
+    n_jobs: -1
+    random_state: 42
+  lightgbm:
+    n_estimators: 100
+    max_depth: 6
+    scale_pos_weight: 54.5
+    learning_rate: 0.1
+    n_jobs: -1
+    random_state: 42

@@ -1,0 +1,27 @@
+# Transformer Deep Learning Configurations
+experiment_id: "transformer_deep_learning"
+description: "Temporal Transformer/Attention models trained on sequence datasets"
+dataset: "Temporal Sequences (95 input features)"
+sequence_path: "datasets/sequences/"
+default_config: "w12_h0"
+seed: 42
+
+models:
+  - transformer
+
+training_parameters:
+  batch_size: 128
+  epochs: 30
+  learning_rate: 0.0005 # Typically slightly lower learning rate for transformers
+  optimizer: "adam"
+  loss: "binary_crossentropy"
+  early_stopping_patience: 5
+
+architectures:
+  transformer:
+    input_dim: 95
+    d_model: 64
+    nhead: 4
+    num_layers: 2
+    dim_feedforward: 128
+    dropout: 0.1

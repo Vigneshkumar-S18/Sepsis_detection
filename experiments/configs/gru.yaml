@@ -1,0 +1,25 @@
+# GRU Deep Learning Configurations
+experiment_id: "gru_deep_learning"
+description: "GRU models trained on temporal sequence datasets"
+dataset: "Temporal Sequences (95 input features)"
+sequence_path: "datasets/sequences/"
+default_config: "w12_h0"
+seed: 42
+
+models:
+  - gru
+
+training_parameters:
+  batch_size: 128
+  epochs: 30
+  learning_rate: 0.001
+  optimizer: "adam"
+  loss: "binary_crossentropy"
+  early_stopping_patience: 5
+
+architectures:
+  gru:
+    input_dim: 95
+    hidden_dim: 64
+    num_layers: 2
+    dropout: 0.2

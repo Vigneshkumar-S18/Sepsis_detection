@@ -1,0 +1,33 @@
+# LSTM and Bi-LSTM Deep Learning Configurations
+experiment_id: "lstm_deep_learning"
+description: "LSTM and Bi-LSTM models trained on temporal sequence datasets"
+dataset: "Temporal Sequences (95 input features)"
+sequence_path: "datasets/sequences/"
+default_config: "w12_h0" # Default experiment to run
+seed: 42
+
+models:
+  - lstm
+  - bilstm
+
+training_parameters:
+  batch_size: 128
+  epochs: 30
+  learning_rate: 0.001
+  optimizer: "adam"
+  loss: "binary_crossentropy"
+  early_stopping_patience: 5
+
+architectures:
+  lstm:
+    input_dim: 95
+    hidden_dim: 64
+    num_layers: 2
+    dropout: 0.2
+    bidirectional: false
+  bilstm:
+    input_dim: 95
+    hidden_dim: 64
+    num_layers: 2
+    dropout: 0.2
+    bidirectional: true
