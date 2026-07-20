@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THAARU Sepsis AI — Clinician Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-[#0b0f19] text-[#e2e8f0] font-['Outfit'] min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#070b13] transition-all duration-500">
+        <div class="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-teal-900/60 via-[#0b0f19] to-[#070b13]"></div>
+        <div class="relative w-full max-w-md p-8 bg-slate-900/65 backdrop-blur-xl border border-teal-500/25 rounded-2xl shadow-2xl shadow-teal-500/10">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 mb-4 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-400 to-teal-200">THAARU Sepsis AI</h1>
+                <p class="text-slate-400 text-sm mt-1">Clinical Decision Support Ingestion System</p>
+            </div>
+            
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Clinician Username</label>
+                    <input type="text" id="username" required value="dr.vignesh" class="w-full px-4 py-2.5 bg-slate-950/80 border border-teal-500/20 focus:border-teal-400 text-teal-100 rounded-lg outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Authorization Role</label>
+                    <select id="user-role" class="w-full px-4 py-2.5 bg-slate-950/80 border border-teal-500/20 focus:border-teal-400 text-teal-100 rounded-lg outline-none transition-colors">
+                        <option value="Doctor">Physician / Doctor</option>
+                        <option value="Nurse">Critical Care Nurse</option>
+                        <option value="Admin">Administrator</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-slate-950 font-semibold tracking-wider rounded-lg shadow-lg hover:shadow-teal-500/10 active:scale-[0.98] transition-all duration-200">
+                    AUTHORIZE CLINICAL SESSION
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN INTERFACE -->
+    <div id="main-interface" class="hidden flex flex-col flex-1 min-h-screen">
+        <!-- TOP NAVIGATION BAR -->
+        <header class="bg-slate-950/80 border-b border-teal-900/40 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-teal-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </span>
+                <span class="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-teal-100">THAARU SEPSIS CDSS</span>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <!-- API Status badge -->
+                <div class="flex items-center space-x-2 bg-teal-950/50 border border-teal-800/30 px-3 py-1.5 rounded-full text-xs text-teal-400">
+                    <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-ping"></span>
+                    <span>API STATUS: HEALTHY</span>
+                </div>
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3 border-l border-slate-800 pl-6">
+                    <div class="text-right">
+                        <div id="profile-name" class="text-sm font-medium text-slate-200">Dr. Vignesh</div>
+                        <div id="profile-role" class="text-xs text-teal-400 font-semibold uppercase tracking-wider">Doctor</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-teal-900/40 border border-teal-500/25 flex items-center justify-center font-bold text-teal-300">
+                        VK
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD CONTAINER -->
+        <main class="flex-1 p-6 space-y-6">
+            <!-- 1. SYSTEM STATS CARDS -->
+            <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-teal-500/5 rounded-full blur-xl group-hover:bg-teal-500/10 transition-all duration-300"></div>
+                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">ICU Occupancy</h3>
+                    <p id="stat-occupancy" class="text-4xl font-bold text-slate-100 mt-2">0</p>
+                    <span class="text-xs text-slate-400 mt-2 block">Active monitored beds</span>
+                </div>
+                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-rose-500/5 rounded-full blur-xl group-hover:bg-rose-500/10 transition-all duration-300"></div>
+                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">High Risk Patients</h3>
+                    <p id="stat-high-risk" class="text-4xl font-bold text-rose-400 mt-2">0</p>
+                    <span class="text-xs text-slate-400 mt-2 block">Risk ratio threshold &gt; 50%</span>
+                </div>
+                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/5 rounded-full blur-xl group-hover:bg-amber-500/10 transition-all duration-300"></div>
+                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Critical Alerts</h3>
+                    <p id="stat-alerts" class="text-4xl font-bold text-amber-400 mt-2">0</p>
+                    <span class="text-xs text-slate-400 mt-2 block">Unacknowledged deterioration alarms</span>
+                </div>
+                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-teal-500/5 rounded-full blur-xl group-hover:bg-teal-500/10 transition-all duration-300"></div>
+                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Average ICU Risk</h3>
+                    <p id="stat-avg-risk" class="text-4xl font-bold text-teal-400 mt-2">0.0%</p>
+                    <span class="text-xs text-slate-400 mt-2 block">System aggregate risk ratio</span>
+                </div>
+            </section>
+
+            <!-- 2. TWO PANEL CORE SCREEN -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- LEFT PANEL: PATIENTS GRID LIST -->
+                <div class="lg:col-span-1 bg-slate-950/60 border border-teal-950/30 rounded-xl p-5 flex flex-col h-[700px]">
+                    <h2 class="text-lg font-bold tracking-wider text-teal-300 mb-4 flex items-center justify-between">
+                        <span>ICU ACTIVE WARD</span>
+                        <span id="update-indicator" class="text-xs text-slate-400 animate-pulse font-normal">Streaming Live...</span>
+                    </h2>
+                    <!-- Patients Cards Container -->
+                    <div id="patient-grid" class="flex-1 overflow-y-auto space-y-4 pr-2">
+                        <div class="text-slate-500 text-sm text-center py-10">No telemetry data ingested yet...</div>
+                    </div>
+                </div>
+
+                <!-- RIGHT PANEL: DETAILED CDSS PREDICTIONS AND EXPLAINABILITY -->
+                <div class="lg:col-span-2 flex flex-col space-y-6">
+                    <!-- DETAILS AREA -->
+                    <div id="details-view" class="bg-slate-950/60 border border-teal-950/30 rounded-xl p-6 flex flex-col flex-1 min-h-[500px]">
+                        <!-- Select Prompt -->
+                        <div id="details-placeholder" class="flex-1 flex flex-col items-center justify-center text-center text-slate-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-teal-500/10 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
+                            </svg>
+                            <p class="text-lg font-medium text-slate-400">No Patient Selected</p>
+                            <p class="text-sm mt-1 max-w-sm">Select an active bed track from the ICU Ward list to view telemetry signals, rolling timelines, and attributions.</p>
+                        </div>
+
+                        <!-- Active Patient Details -->
+                        <div id="details-content" class="hidden space-y-6">
+                            <!-- Detail Header -->
+                            <div class="flex items-start justify-between border-b border-slate-800 pb-4">
+                                <div>
+                                    <div class="flex items-center space-x-3">
+                                        <h2 id="patient-title" class="text-2xl font-bold text-slate-100">Patient P1023</h2>
+                                        <span id="patient-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wider">HIGH</span>
+                                    </div>
+                                    <div class="text-xs text-slate-400 mt-1">Age: <span id="pat-age">65</span> | Gender: <span id="pat-gender">Male</span> | ICU Hours: <span id="pat-hours">12</span></div>
+                                </div>
+                                <div class="text-right">
+                                    <button id="btn-ack" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs tracking-wider rounded transition-colors uppercase">
+                                        Acknowledge Alarm
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Dashboard 3 Panels layout -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Vitals list panel -->
+                                <div class="bg-slate-900/30 border border-slate-800/40 rounded-xl p-4 flex flex-col justify-between">
+                                    <h4 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-3">Live Telemetry</h4>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
+                                            <span class="text-slate-400 text-sm">Heart Rate</span>
+                                            <span id="val-hr" class="font-bold text-slate-200">108 bpm</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
+                                            <span class="text-slate-400 text-sm">MAP</span>
+                                            <span id="val-map" class="font-bold text-slate-200">74 mmHg</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
+                                            <span class="text-slate-400 text-sm">Temperature</span>
+                                            <span id="val-temp" class="font-bold text-slate-200">38.2 °C</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
+                                            <span class="text-slate-400 text-sm">Respiration</span>
+                                            <span id="val-resp" class="font-bold text-slate-200">22 /min</span>
+                                        </div>
+                                        <div class="flex justify-between pb-1">
+                                            <span class="text-slate-400 text-sm">SpO2</span>
+                                            <span id="val-spo2" class="font-bold text-slate-200">93%</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800 mt-4">
+                                        <div class="text-slate-400 text-xs">Clinical Recommendation:</div>
+                                        <p id="clinical-rec" class="text-amber-300/90 text-xs mt-1 leading-relaxed">Consider repeating lactate measurement.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Risk Timeline Chart -->
+                                <div class="bg-slate-900/30 border border-slate-800/40 rounded-xl p-4 flex flex-col col-span-2">
+                                    <h4 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-2">Rolling Sepsis Risk Timeline</h4>
+                                    <div class="relative h-[220px]">
+                                        <canvas id="timelineChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Attributions / Online Integrated Gradients -->
+                            <div class="bg-slate-900/30 border border-slate-800/40 rounded-xl p-4">
+                                <h4 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-4">Integrated Gradients Local Attribution Analysis</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="attribution-bars">
+                                    <!-- Dynamic bars -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script imports -->
+    <script src="/app.js"></script>
+</body>
+</html>

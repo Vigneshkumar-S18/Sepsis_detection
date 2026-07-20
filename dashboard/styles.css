@@ -1,0 +1,59 @@
+/* Custom Doctor Dashboard Style System */
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.1);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(20, 184, 166, 0.25);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(20, 184, 166, 0.45);
+}
+
+/* Glassmorphism containers */
+.glass-container {
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(20, 184, 166, 0.15);
+}
+
+/* Sparklines and animations */
+@keyframes glow-red {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(244, 63, 94, 0.2);
+        border-color: rgba(244, 63, 94, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(244, 63, 94, 0.45);
+        border-color: rgba(244, 63, 94, 0.7);
+    }
+}
+
+@keyframes glow-amber {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+        border-color: rgba(245, 158, 11, 0.55);
+    }
+}
+
+.glow-risk-high {
+    animation: glow-red 3s infinite ease-in-out;
+}
+
+.glow-risk-medium {
+    animation: glow-amber 3s infinite ease-in-out;
+}
+
+.transition-height {
+    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}

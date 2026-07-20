@@ -31,6 +31,24 @@ app.add_middleware(
 # Register endpoints router
 app.include_router(patient_router, prefix="/api")
 
+from fastapi.responses import HTMLResponse, FileResponse
+
+@app.get("/", response_class=HTMLResponse)
+async def read_index():
+    index_path = os.path.join(project_root, "dashboard", "index.html")
+    with open(index_path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.get("/styles.css")
+async def read_css():
+    css_path = os.path.join(project_root, "dashboard", "styles.css")
+    return FileResponse(css_path)
+
+@app.get("/app.js")
+async def read_js():
+    js_path = os.path.join(project_root, "dashboard", "app.js")
+    return FileResponse(js_path)
+
 
 @app.get("/health")
 async def health_check():

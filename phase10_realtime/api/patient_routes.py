@@ -81,13 +81,27 @@ async def get_patient_prediction(patient_id: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
         
-    # Inference
-    risk = predictor.predict_risk(sequence)
-    status = "High Risk" if risk >= 0.50 else "Low Risk"
-    
-    # Save prediction history
+    # Get previous prediction to calculate delta
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute(
+        "SELECT risk FROM predictions WHERE patient_id = ? ORDER BY id DESC LIMIT 1",
+        (patient_id,)
+    )
+    prev_row = cursor.fetchone()
+    prev_risk = prev_row["risk"] if prev_row else None
+    
+    # Inference
+    risk = predictor.predict_risk(sequence)
+    
+    # Classifications
+    status = "High Risk" if risk >= 0.50 else "Low Risk"
+    risk_level = "High" if risk >= 0.70 else ("Medium" if risk >= 0.50 else "Low")
+    
+    delta_risk = risk - prev_risk if prev_risk is not None else 0.0
+    trend = "Increasing" if delta_risk > 0.05 else ("Decreasing" if delta_risk < -0.05 else "Stable")
+    
+    # Save prediction history
     timestamp = datetime.now().isoformat()
     cursor.execute(
         "INSERT INTO predictions (patient_id, timestamp, risk, status) VALUES (?, ?, ?, ?)",
@@ -99,14 +113,32 @@ async def get_patient_prediction(patient_id: str):
     # Evaluate alerts
     alert = alert_engine.evaluate_patient_risk(patient_id, risk)
     
+    # Local explainability (top features attribution) in real-time
+    explanation = explainer.attribute_sequence(sequence)
+    top_features = explanation["top_features"]
+    
+    # Clinical recommendation logic matching decision support guidelines
+    if risk >= 0.70:
+        recommendation = "Immediate physician review. Check vital stability and lactate clearance."
+    elif risk >= 0.50:
+        recommendation = "Escalate monitoring frequency. Consider checking WBC count and repeating vitals."
+    else:
+        recommendation = "Routine clinical monitoring. Patient is physiologically stable."
+
     latency_ms = (time.time() - t0) * 1000.0
     
     return {
         "patient_id": patient_id,
+        "timestamp": timestamp,
         "risk": risk,
+        "risk_level": risk_level,
         "status": status,
+        "trend": trend,
+        "delta_risk": delta_risk,
+        "top_features": top_features,
         "alert_triggered": alert is not None,
         "alert": alert,
+        "recommendation": recommendation,
         "latency_ms": latency_ms
     }
 
@@ -187,3 +219,79 @@ async def get_dashboard_summary():
         "active_alerts": active_alerts,
         "average_risk": float(avg_risk)
     }
+
+
+@router.get("/patients")
+async def get_patients_list():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Fetch all patients
+    cursor.execute("SELECT * FROM patients")
+    patients_rows = cursor.fetchall()
+    
+    patients_list = []
+    for p in patients_rows:
+        p_id = p["patient_id"]
+        
+        # Get latest measurements
+        cursor.execute(
+            "SELECT * FROM measurements WHERE patient_id = ? ORDER BY id DESC LIMIT 1",
+            (p_id,)
+        )
+        meas_row = cursor.fetchone()
+        
+        # Get latest prediction
+        cursor.execute(
+            "SELECT * FROM predictions WHERE patient_id = ? ORDER BY id DESC LIMIT 1",
+            (p_id,)
+        )
+        pred_row = cursor.fetchone()
+        
+        # Check active alerts
+        cursor.execute(
+            "SELECT * FROM alerts WHERE patient_id = ? AND acknowledged = 0 ORDER BY id DESC LIMIT 1",
+            (p_id,)
+        )
+        alert_row = cursor.fetchone()
+        
+        latest_meas = dict(meas_row) if meas_row else {}
+        latest_pred = dict(pred_row) if pred_row else {}
+        
+        patients_list.append({
+            "patient_id": p_id,
+            "name": p["name"],
+            "age": p["age"],
+            "gender": "Male" if p["gender"] == 1 else "Female",
+            "latest_vitals": {
+                "HR": latest_meas.get("HR", 0.0),
+                "MAP": latest_meas.get("MAP", 0.0),
+                "Temp": latest_meas.get("Temp", 0.0),
+                "Resp": latest_meas.get("Resp", 0.0),
+                "SpO2": latest_meas.get("O2Sat", 0.0),
+                "ICULOS": latest_meas.get("ICULOS", 0.0)
+            },
+            "latest_prediction": {
+                "risk": latest_pred.get("risk", 0.0),
+                "status": latest_pred.get("status", "Low Risk")
+            },
+            "alert_triggered": alert_row is not None,
+            "alert": dict(alert_row) if alert_row else None
+        })
+        
+    conn.close()
+    return patients_list
+
+
+@router.get("/prediction/{patient_id}/history")
+async def get_patient_prediction_history(patient_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT timestamp, risk FROM predictions WHERE patient_id = ? ORDER BY id ASC",
+        (patient_id,)
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    
+    return [dict(row) for row in rows]
