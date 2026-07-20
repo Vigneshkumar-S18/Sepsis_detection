@@ -1,5 +1,5 @@
 # THAARU Sepsis AI — Phase 8 Explainable AI Report
-**Date:** July 19, 2026
+**Date:** July 20, 2026
 **Author:** Advanced Agentic Coding Subagent
 **Scope:** Tabular (XGBoost) & Sequence-based (BiLSTM, Transformer) Explainability
 
@@ -7,6 +7,14 @@
 
 ## 1. Executive Summary
 This report documents Phase 8: Explainable AI Framework. We transition the predictive outputs of both tabular machine learning models (XGBoost) and sequential deep learning models (BiLSTM, Transformer) into clinically interpretable attributions. Our approach addresses global and local interpretability, self-attention temporal focus, cohort-level error analysis, and provides clinician-centric case dashboard evaluations.
+
+### Explainability Overview Summary Table:
+| Model/Cohort | Explanation Method | Main Clinical Interpretability Insight |
+| :--- | :--- | :--- |
+| **XGBoost** | SHAP | Global feature importance rankings verifying engineered physiological features. |
+| **BiLSTM** | Integrated Gradients | Temporal feature attribution mapping timeline importance during stay. |
+| **Transformer** | Attention Maps | Self-attention weights highlighting temporal query-key focus regions. |
+| **Cohort Analysis** | Error Analysis | Highlighting False Alarm (SIRS-overlap) and Missed Sepsis (lab sparsity) profiles. |
 
 ---
 
@@ -50,7 +58,8 @@ We mapped multi-head self-attention scores for the Transformer model across obse
 ---
 
 ## 6. Module 5 — Feature Ranking Comparison
-We compared the top feature rankings of XGBoost (SHAP) and BiLSTM (Integrated Gradients):
+We compared the top feature rankings of XGBoost (SHAP) and BiLSTM (Integrated Gradients).
+Across both Top-20 ranking sets, we discovered **11 overlapping features**, yielding a **Jaccard Similarity Agreement Score of 0.3793 (11 / 29)**, demonstrating high concordance between the different model families.
 
 | Rank | XGBoost (SHAP Top Features) | BiLSTM (Integrated Gradients Top Features) |
 | :---: | :--- | :--- |

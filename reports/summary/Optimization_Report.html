@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THAARU Sepsis AI — Phase 9 Optimization Report</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #fafafa; color: #1e293b; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        h1 { color: #0f766e; font-size: 26px; border-bottom: 3px solid #0f766e; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #0f766e; font-size: 18px; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        .meta { color: #64748b; font-size: 14px; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13.5px; }
+        th, td { text-align: left; padding: 10px; border: 1px solid #cbd5e1; }
+        th { background: #0f766e; color: white; }
+        tr:nth-child(even) { background: #f8fafc; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>THAARU Sepsis AI — Phase 9 Optimization Report</h1>
+    <div class="meta">Date: July 19, 2026 | Author: Advanced Agentic Coding Subagent</div>
+
+    <h2>1. Executive Summary</h2>
+    <p>Targeted hyperparameter sweeping to maximize prediction validation AUPRC for both XGBoost and BiLSTM classifiers.</p>
+
+    <h2>2. XGBoost Trial Leaderboard</h2>
+    <table>
+        <tr><th>Trial</th><th>Max Depth</th><th>Learning Rate</th><th>N Estimators</th><th>Subsample</th><th>Colsample</th><th>Val AUPRC</th><th>Val AUROC</th></tr>
+        <tr><td>1</td><td>6</td><td>0.1</td><td>100</td><td>1.0</td><td>1.0</td><td>0.0829</td><td>0.8054</td></tr>
+<tr><td>2</td><td>6</td><td>0.2</td><td>100</td><td>1.0</td><td>0.8</td><td>0.0761</td><td>0.7830</td></tr>
+<tr><td>3</td><td>4</td><td>0.05</td><td>150</td><td>1.0</td><td>0.8</td><td>0.0902</td><td>0.8231</td></tr>
+<tr><td>4</td><td>6</td><td>0.1</td><td>150</td><td>0.8</td><td>0.8</td><td>0.0762</td><td>0.8025</td></tr>
+<tr><td>5</td><td>4</td><td>0.1</td><td>100</td><td>1.0</td><td>0.8</td><td>0.0927</td><td>0.8216</td></tr>
+
+    </table>
+
+    <h2>3. BiLSTM Trial Leaderboard</h2>
+    <table>
+        <tr><th>Trial</th><th>Hidden Size</th><th>Layers</th><th>Dropout</th><th>Learning Rate</th><th>Batch Size</th><th>Val AUPRC</th><th>Val AUROC</th></tr>
+        <tr><td>1</td><td>64</td><td>1</td><td>0.2</td><td>0.001</td><td>1024</td><td>0.0902</td><td>0.8159</td></tr>
+<tr><td>2</td><td>32</td><td>2</td><td>0.3</td><td>0.001</td><td>1024</td><td>0.0839</td><td>0.8158</td></tr>
+<tr><td>3</td><td>32</td><td>1</td><td>0.3</td><td>0.002</td><td>512</td><td>0.0924</td><td>0.8188</td></tr>
+<tr><td>4</td><td>128</td><td>2</td><td>0.2</td><td>0.0005</td><td>512</td><td>0.0917</td><td>0.8220</td></tr>
+<tr><td>5</td><td>32</td><td>2</td><td>0.1</td><td>0.0005</td><td>1024</td><td>0.0777</td><td>0.8098</td></tr>
+
+    </table>
+</div>
+</body>
+</html>
