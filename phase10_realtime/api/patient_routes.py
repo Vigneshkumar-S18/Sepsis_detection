@@ -125,8 +125,9 @@ async def get_patient_prediction(patient_id: str):
     else:
         recommendation = "Routine clinical monitoring. Patient is physiologically stable."
 
+    certainty = 0.5 + abs(risk - 0.5)
     latency_ms = (time.time() - t0) * 1000.0
-    
+
     return {
         "patient_id": patient_id,
         "timestamp": timestamp,
@@ -136,6 +137,7 @@ async def get_patient_prediction(patient_id: str):
         "trend": trend,
         "delta_risk": delta_risk,
         "top_features": top_features,
+        "certainty": certainty,
         "alert_triggered": alert is not None,
         "alert": alert,
         "recommendation": recommendation,
@@ -154,7 +156,9 @@ async def get_patient_explanation(patient_id: str):
     return {
         "patient_id": patient_id,
         "top_features": explanation["top_features"],
-        "attribution_scores": explanation["attribution_scores"]
+        "attribution_scores": explanation["attribution_scores"],
+        "feature_names": explainer.feature_names,
+        "temporal_attributions": explanation["temporal_attributions"]
     }
 
 

@@ -10,6 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
     
     let activePatientId = null;
     let timelineChart = null;
+    let cachedTemporalAttributions = null;
+    let cachedFeatureNames = null;
+
+    // Attach step history selector change listener
+    const stepSelector = document.getElementById("explanation-history-step");
+    if (stepSelector) {
+        stepSelector.addEventListener("change", () => {
+            updateAttributionFromStep();
+        });
+    }
 
     loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -197,17 +207,63 @@ document.addEventListener("DOMContentLoaded", () => {
             // C. Render Chart
             renderRiskTimelineChart(history);
             
-            // D. Render IG attributions
-            renderExplainabilityBars(explanation);
+            // Cache explanations for history steps selection
+            cachedTemporalAttributions = explanation.temporal_attributions;
+            cachedFeatureNames = explanation.feature_names;
             
-            // E. Fetch recommendation from prediction endpoint directly to maintain consistency
+            // D. Render IG attributions (resets selector to Current / index 11)
+            document.getElementById("explanation-history-step").value = "11";
+            updateAttributionFromStep();
+            
+            // E. Fetch recommendation and details from prediction endpoint directly
             const resPred = await fetch(`/api/prediction/${patient_id}`);
             const pred = await resPred.json();
             document.getElementById("clinical-rec").textContent = pred.recommendation;
 
+            // F. Render trend and delta updates
+            const deltaPercent = Math.abs(pred.delta_risk * 100).toFixed(0);
+            let trendHtml = "";
+            if (pred.trend === "Increasing") {
+                trendHtml = `<span class="text-rose-400 font-bold ml-2">↑ Increasing (+${deltaPercent}%)</span>`;
+            } else if (pred.trend === "Decreasing") {
+                trendHtml = `<span class="text-emerald-400 font-bold ml-2">↓ Improving (-${deltaPercent}%)</span>`;
+            } else {
+                trendHtml = `<span class="text-slate-400 font-semibold ml-2">→ Stable (0%)</span>`;
+            }
+            document.getElementById("risk-trend-val").innerHTML = trendHtml;
+
+            // G. Render Certainty score
+            const certaintyPercent = (pred.certainty * 100).toFixed(0);
+            document.getElementById("certainty-val").textContent = `Certainty: ${certaintyPercent}%`;
+
+            // H. Render Last updated timestamp
+            const timeStr = new Date(pred.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById("last-updated-val").textContent = `Last Evaluated: ${timeStr} | Uptime Monitor Active`;
+
         } catch (e) {
             console.error("Error fetching detailed metrics:", e);
         }
+    }
+
+    // 7.5 Update IG attributions from temporal step selection
+    function updateAttributionFromStep() {
+        if (!cachedTemporalAttributions || !cachedFeatureNames) return;
+        const stepIdx = parseInt(document.getElementById("explanation-history-step").value);
+        const stepAttributions = cachedTemporalAttributions[stepIdx];
+        
+        // Map scores and sort descending
+        const mapped = cachedFeatureNames.map((name, i) => ({
+            feature: name,
+            score: Math.abs(stepAttributions[i])
+        }));
+        
+        mapped.sort((a, b) => b.score - a.score);
+        const top5 = mapped.slice(0, 5);
+        
+        renderExplainabilityBars({
+            top_features: top5.map(x => x.feature),
+            attribution_scores: top5.map(x => x.score)
+        });
     }
 
     // 8. Render Risk Timeline Chart (Chart.js)
