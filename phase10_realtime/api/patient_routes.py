@@ -119,7 +119,10 @@ async def get_patient_prediction(patient_id: str):
     
     # Local explainability (top features attribution) in real-time
     explanation = explainer.attribute_sequence(sequence)
-    top_features = explanation["top_features"]
+    top_features = [
+        {"feature": str(name), "attribution": float(score)}
+        for name, score in zip(explanation["top_features"], explanation["attribution_scores"])
+    ]
     
     # Clinical recommendation logic matching decision support guidelines
     if risk >= 0.70:
@@ -313,7 +316,7 @@ class DatasetPayloadModel(BaseModel):
 @router.post("/evaluate_dataset")
 async def evaluate_dataset_input(payload: DatasetPayloadModel):
     t0 = time.time()
-    content = payload.file_content.trim() if hasattr(payload.file_content, 'trim') else payload.file_content.strip()
+    content = str(payload.file_content).strip()
     
     if not content:
         raise HTTPException(status_code=400, detail="Empty dataset content provided.")
@@ -377,15 +380,39 @@ async def evaluate_dataset_input(payload: DatasetPayloadModel):
     
     # Calculate Captum Integrated Gradients attributions on the sequence
     explanation = explainer.attribute_sequence(seq)
-    top_features = explanation["top_features"]
+    top_features = [
+        {"feature": str(name), "attribution": float(score)}
+        for name, score in zip(explanation["top_features"], explanation["attribution_scores"])
+    ]
     
-    # Extract vitals timelines for charts
+    # Extract vitals timelines for charts with robust case-insensitive column matching
     vitals_timeline = {}
-    for col in ["HR", "MAP", "Resp", "Temp", "O2Sat", "WBC", "Lactate", "Creatinine", "SBP", "DBP"]:
-        if col in df.columns:
-            vitals_timeline[col] = df[col].fillna(0).tolist()
-        elif col == "O2Sat" and "SpO2" in df.columns:
-            vitals_timeline["O2Sat"] = df["SpO2"].fillna(0).tolist()
+    col_map = {str(c).strip().upper(): c for c in df.columns}
+    
+    mapping_rules = [
+        ("HR", ["HR", "HEARTRATE", "HEART_RATE"]),
+        ("MAP", ["MAP", "MEANARTERIALPRESSURE", "MEAN_MAP"]),
+        ("Resp", ["RESP", "RESPRATE", "RESPIRATORY_RATE", "RR"]),
+        ("Temp", ["TEMP", "TEMPERATURE"]),
+        ("O2Sat", ["O2SAT", "SPO2", "SATURATION"]),
+        ("SpO2", ["SPO2", "O2SAT", "SATURATION"]),
+        ("WBC", ["WBC", "WHITE_BLOOD_CELLS"]),
+        ("Lactate", ["LACTATE"]),
+        ("Creatinine", ["CREATININE"]),
+        ("SBP", ["SBP"]),
+        ("DBP", ["DBP"])
+    ]
+    
+    for key, aliases in mapping_rules:
+        found = False
+        for alias in aliases:
+            if alias in col_map:
+                vitals_timeline[key] = [float(x) for x in df[col_map[alias]].fillna(0).tolist()]
+                found = True
+                break
+        if not found:
+            vitals_timeline[key] = []
+
             
     # Risk Level & Status
     if final_risk >= 0.70:

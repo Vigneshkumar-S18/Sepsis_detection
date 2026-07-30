@@ -403,12 +403,16 @@ function renderEvaluationResults(res) {
     updateXAIChart(res.top_features);
 
     // 5. Update Quick Pills
-    const vMap = res.vitals_timeline;
+    const vMap = res.vitals_timeline || {};
     if (vMap.HR && vMap.HR.length) document.getElementById('pill-hr').innerText = `${vMap.HR[vMap.HR.length - 1].toFixed(0)} bpm`;
     if (vMap.MAP && vMap.MAP.length) document.getElementById('pill-map').innerText = `${vMap.MAP[vMap.MAP.length - 1].toFixed(0)} mmHg`;
-    if (vMap.Resp && vMap.Resp.length) document.getElementById('pill-resp').innerText = `${vMap.Resp[vMap.Resp.length - 1].toFixed(0)} rpm` || "18 rpm";
+    if (vMap.Resp && vMap.Resp.length) document.getElementById('pill-resp').innerText = `${vMap.Resp[vMap.Resp.length - 1].toFixed(0)} rpm`;
     if (vMap.Temp && vMap.Temp.length) document.getElementById('pill-temp').innerText = `${vMap.Temp[vMap.Temp.length - 1].toFixed(1)} °C`;
-    if (vMap.SpO2 && vMap.SpO2.length) document.getElementById('pill-spo2').innerText = `${vMap.SpO2[vMap.SpO2.length - 1].toFixed(0)}%`;
+    
+    const spo2Val = (vMap.SpO2 && vMap.SpO2.length) ? vMap.SpO2[vMap.SpO2.length - 1] : ((vMap.O2Sat && vMap.O2Sat.length) ? vMap.O2Sat[vMap.O2Sat.length - 1] : null);
+    if (spo2Val !== null && spo2Val !== undefined) document.getElementById('pill-spo2').innerText = `${spo2Val.toFixed(0)}%`;
+    if (vMap.WBC && vMap.WBC.length) document.getElementById('pill-wbc').innerText = `${vMap.WBC[vMap.WBC.length - 1].toFixed(1)} k/µL`;
+    if (vMap.Lactate && vMap.Lactate.length) document.getElementById('pill-lactate').innerText = `${vMap.Lactate[vMap.Lactate.length - 1].toFixed(1)} mmol/L`;
 
     // 6. Update Decision Support Panel
     updateAlertBanner(res.final_risk, res.recommendations);
@@ -560,9 +564,9 @@ function updateVitalsChart() {
 
 // --- UPDATE XAI CHART ---
 function updateXAIChart(features) {
-    if (!features) return;
-    const labels = features.map(f => f.feature);
-    const data = features.map(f => f.attribution !== undefined ? f.attribution : f.impact);
+    if (!features || !features.length) return;
+    const labels = features.map(f => typeof f === 'object' ? (f.feature || f.name || String(f)) : String(f));
+    const data = features.map(f => typeof f === 'object' ? (f.attribution !== undefined ? f.attribution : (f.impact !== undefined ? f.impact : 0)) : 0);
     const bgColors = data.map(v => v >= 0 ? 'rgba(20, 184, 166, 0.7)' : 'rgba(56, 189, 248, 0.5)');
 
     state.charts.xaiBar.data.labels = labels;
@@ -570,6 +574,7 @@ function updateXAIChart(features) {
     state.charts.xaiBar.data.datasets[0].backgroundColor = bgColors;
     state.charts.xaiBar.update();
 }
+
 
 // --- SETTINGS UI ---
 function updateSettingsUI() {
