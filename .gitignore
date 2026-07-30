@@ -1,6 +1,15 @@
-# Ignore clinical datasets
+# Ignore clinical datasets and large training data
 datasets/
+newpreprocessedtrainingdata/
+baseline_models.zip
+*.zip
+*.db
+
 # Ignore python virtual environments and cache
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.venv/
+env/
+venv/
+

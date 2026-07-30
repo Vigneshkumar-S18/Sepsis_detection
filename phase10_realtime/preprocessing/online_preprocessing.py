@@ -111,13 +111,14 @@ class OnlinePreprocessor:
         df_out['First_24h_Flag'] = (df_unscaled['ICULOS'] <= 24).astype(int)
         df_out['Diurnal_Proxy_Hour'] = (df_unscaled['ICULOS'] % 24).astype(int)
 
-        # 11. Apply standardized scaling only to features seen at fit time
+        # 11. Reindex to align with scaler feature names
+        df_out = df_out.reindex(columns=self.scaler.feature_names_in_, fill_value=0.0)
+
+        # 12. Apply standardized scaling
         cols_to_scale = list(self.scaler.feature_names_in_)
         df_out[cols_to_scale] = self.scaler.transform(df_out[cols_to_scale])
 
-        # 12. Reorder columns to exactly match expected feature ordering (95 features)
-        for col in self.expected_features:
-            if col not in df_out.columns:
-                df_out[col] = 0.0
+        # 13. Reorder columns to match expected feature ordering
+        df_out = df_out.reindex(columns=self.expected_features, fill_value=0.0)
                 
         return df_out[self.expected_features].values

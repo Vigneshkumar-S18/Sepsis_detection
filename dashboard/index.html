@@ -3,243 +3,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THAARU Sepsis AI — Clinician Dashboard</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>SEPSIS AI — Predictive Clinical Decision Support System</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- SheetJS Excel Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-[#0b0f19] text-[#e2e8f0] font-['Outfit'] min-h-screen flex flex-col overflow-x-hidden">
+<body>
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#070b13] transition-all duration-500">
-        <div class="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-teal-900/60 via-[#0b0f19] to-[#070b13]"></div>
-        <div class="relative w-full max-w-md p-8 bg-slate-900/65 backdrop-blur-xl border border-teal-500/25 rounded-2xl shadow-2xl shadow-teal-500/10">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 mb-4 animate-pulse">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                </div>
-                <h1 class="text-3xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-400 to-teal-200">THAARU Sepsis AI</h1>
-                <p class="text-slate-400 text-sm mt-1">Clinical Decision Support Ingestion System</p>
+    <!-- TOP HEADER / NAVBAR -->
+    <header class="app-header">
+        <div class="header-brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
             </div>
-            
-            <form id="login-form" class="space-y-6">
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Clinician Username</label>
-                    <input type="text" id="username" required value="dr.vignesh" class="w-full px-4 py-2.5 bg-slate-950/80 border border-teal-500/20 focus:border-teal-400 text-teal-100 rounded-lg outline-none transition-colors">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Authorization Role</label>
-                    <select id="user-role" class="w-full px-4 py-2.5 bg-slate-950/80 border border-teal-500/20 focus:border-teal-400 text-teal-100 rounded-lg outline-none transition-colors">
-                        <option value="Doctor">Physician / Doctor</option>
-                        <option value="Nurse">Critical Care Nurse</option>
-                        <option value="Admin">Administrator</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-slate-950 font-semibold tracking-wider rounded-lg shadow-lg hover:shadow-teal-500/10 active:scale-[0.98] transition-all duration-200">
-                    AUTHORIZE CLINICAL SESSION
-                </button>
-            </form>
+            <div class="brand-titles">
+                <h1>SEPSIS <span class="accent-text">AI</span></h1>
+                <p>Predictive Early Warning & Clinical Decision Support System</p>
+            </div>
         </div>
-    </div>
 
-    <!-- MAIN INTERFACE -->
-    <div id="main-interface" class="hidden flex flex-col flex-1 min-h-screen">
-        <!-- TOP NAVIGATION BAR -->
-        <header class="bg-slate-950/80 border-b border-teal-900/40 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-teal-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </span>
-                <span class="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-teal-100">THAARU SEPSIS CDSS</span>
+        <nav class="nav-tabs">
+            <button class="nav-btn active" data-tab="dashboard-tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Model Testing & Bedside Dashboard
+            </button>
+            <button class="nav-btn" data-tab="report-tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Project Benchmark Report
+            </button>
+            <button class="nav-btn" data-tab="settings-tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Thresholds & Controls
+            </button>
+        </nav>
+
+        <div class="header-status">
+            <div class="status-badge live">
+                <span class="dot-pulse"></span>
+                <span>BI-LSTM CHAMPION MODEL (391 FEATURES)</span>
             </div>
+        </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="main-container">
+
+        <!-- TAB 1: BEDSIDE DASHBOARD & INPUT DATA TESTING -->
+        <section id="dashboard-tab" class="tab-content active">
             
-            <div class="flex items-center space-x-4">
-                <!-- API Status badge -->
-                <div class="flex items-center space-x-2 bg-teal-950/50 border border-teal-800/30 px-3 py-1.5 rounded-full text-[10px] text-teal-400">
-                    <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
-                    <span>API: HEALTHY</span>
-                </div>
-                <!-- Model Status badge -->
-                <div class="flex items-center space-x-2 bg-emerald-950/50 border border-emerald-800/30 px-3 py-1.5 rounded-full text-[10px] text-emerald-400">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>AI ENGINE: ONLINE</span>
-                </div>
-            </div>
-                <!-- User Profile -->
-                <div class="flex items-center space-x-3 border-l border-slate-800 pl-6">
-                    <div class="text-right">
-                        <div id="profile-name" class="text-sm font-medium text-slate-200">Dr. Vignesh</div>
-                        <div id="profile-role" class="text-xs text-teal-400 font-semibold uppercase tracking-wider">Doctor</div>
+            <!-- INPUT DATASET TESTING PANEL -->
+            <div class="glass-card input-testing-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 class="card-title">Test Patient Dataset in BiLSTM Champion Model</h2>
+                        <p class="sub-text">Paste Excel sheet rows, upload an Excel file (.xlsx), or manually enter parameters to evaluate</p>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-teal-900/40 border border-teal-500/25 flex items-center justify-center font-bold text-teal-300">
-                        VK
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- DASHBOARD CONTAINER -->
-        <main class="flex-1 p-6 space-y-6">
-            <!-- 1. SYSTEM STATS CARDS -->
-            <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-teal-500/5 rounded-full blur-xl group-hover:bg-teal-500/10 transition-all duration-300"></div>
-                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">ICU Occupancy</h3>
-                    <p id="stat-occupancy" class="text-4xl font-bold text-slate-100 mt-2">0</p>
-                    <span class="text-xs text-slate-400 mt-2 block">Active monitored beds</span>
-                </div>
-                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-rose-500/5 rounded-full blur-xl group-hover:bg-rose-500/10 transition-all duration-300"></div>
-                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">High Risk Patients</h3>
-                    <p id="stat-high-risk" class="text-4xl font-bold text-rose-400 mt-2">0</p>
-                    <span class="text-xs text-slate-400 mt-2 block">Risk ratio threshold &gt; 50%</span>
-                </div>
-                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/5 rounded-full blur-xl group-hover:bg-amber-500/10 transition-all duration-300"></div>
-                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Critical Alerts</h3>
-                    <p id="stat-alerts" class="text-4xl font-bold text-amber-400 mt-2">0</p>
-                    <span class="text-xs text-slate-400 mt-2 block">Unacknowledged deterioration alarms</span>
-                </div>
-                <div class="bg-slate-900/50 border border-teal-950/40 rounded-xl p-5 shadow-lg relative overflow-hidden group">
-                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-teal-500/5 rounded-full blur-xl group-hover:bg-teal-500/10 transition-all duration-300"></div>
-                    <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Average ICU Risk</h3>
-                    <p id="stat-avg-risk" class="text-4xl font-bold text-teal-400 mt-2">0.0%</p>
-                    <span class="text-xs text-slate-400 mt-2 block">System aggregate risk ratio</span>
-                </div>
-            </section>
-
-            <!-- 2. TWO PANEL CORE SCREEN -->
-            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- LEFT PANEL: PATIENTS GRID LIST -->
-                <div class="lg:col-span-1 bg-slate-950/60 border border-teal-950/30 rounded-xl p-5 flex flex-col h-[700px]">
-                    <h2 class="text-lg font-bold tracking-wider text-teal-300 mb-4 flex items-center justify-between">
-                        <span>ICU ACTIVE WARD</span>
-                        <span id="update-indicator" class="text-xs text-slate-400 animate-pulse font-normal">Streaming Live...</span>
-                    </h2>
-                    <!-- Patients Cards Container -->
-                    <div id="patient-grid" class="flex-1 overflow-y-auto space-y-4 pr-2">
-                        <div class="text-slate-500 text-sm text-center py-10">No telemetry data ingested yet...</div>
-                    </div>
+                    <span class="champion-model-tag">BiLSTM Champion Engine</span>
                 </div>
 
-                <!-- RIGHT PANEL: DETAILED CDSS PREDICTIONS AND EXPLAINABILITY -->
-                <div class="lg:col-span-2 flex flex-col space-y-6">
-                    <!-- DETAILS AREA -->
-                    <div id="details-view" class="bg-slate-950/60 border border-teal-950/30 rounded-xl p-6 flex flex-col flex-1 min-h-[500px]">
-                        <!-- Select Prompt -->
-                        <div id="details-placeholder" class="flex-1 flex flex-col items-center justify-center text-center text-slate-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-teal-500/10 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
-                            </svg>
-                            <p class="text-lg font-medium text-slate-400">No Patient Selected</p>
-                            <p class="text-sm mt-1 max-w-sm">Select an active bed track from the ICU Ward list to view telemetry signals, rolling timelines, and attributions.</p>
+                <div class="input-options-grid-3">
+                    
+                    <!-- OPTION A: PASTE EXCEL SHEET DATA -->
+                    <div class="input-option-box">
+                        <div class="form-section-title">Option 1: Paste Excel Sheet Data</div>
+                        <p class="sub-text" style="margin-bottom: 0.5rem;">Copy rows directly from Excel (Ctrl+C) and paste below:</p>
+                        <textarea id="excel-paste-input" class="excel-textarea" placeholder="Paste Excel cells here (e.g. HR  O2Sat  Temp  MAP  Resp  WBC  Lactate)..."></textarea>
+                        <button type="button" class="btn primary-btn full-width" onclick="submitPastedExcelData()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                            Evaluate Pasted Excel Data
+                        </button>
+                    </div>
+
+                    <!-- OPTION B: UPLOAD EXCEL / PSV FILE -->
+                    <div class="input-option-box">
+                        <div class="form-section-title">Option 2: Upload Excel File</div>
+                        <div class="drop-zone" id="file-drop-zone">
+                            <div class="drop-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            </div>
+                            <p>Upload Excel / PSV / CSV File or <label for="file-input" class="browse-link">Browse Computer</label></p>
+                            <input type="file" id="file-input" accept=".xlsx,.xls,.psv,.csv,.json,.tsv,.txt" hidden>
+                            <span class="file-name-display" id="uploaded-file-name">No file loaded</span>
                         </div>
+                        <button type="button" class="btn primary-btn full-width" style="margin-top: 0.5rem;" onclick="submitUploadedFile()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Evaluate Uploaded File
+                        </button>
+                    </div>
 
-                        <!-- Active Patient Details -->
-                        <div id="details-content" class="hidden space-y-6">
-                            <!-- Detail Header -->
-                            <div class="flex items-start justify-between border-b border-slate-800 pb-4">
-                                <div>
-                                    <div class="flex items-center space-x-3 flex-wrap">
-                                        <h2 id="patient-title" class="text-2xl font-bold text-slate-100">Patient P1023</h2>
-                                        <span id="patient-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wider">HIGH</span>
-                                        <span id="risk-trend-val" class="text-sm font-semibold text-slate-300"></span>
-                                        <span id="certainty-val" class="text-sm font-medium text-teal-400"></span>
-                                    </div>
-                                    <div class="text-xs text-slate-400 mt-1">Age: <span id="pat-age">65</span> | Gender: <span id="pat-gender">Male</span> | ICU Hours: <span id="pat-hours">12</span></div>
-                                    <div class="text-[11px] text-slate-500 mt-1" id="last-updated-val"></div>
+                    <!-- OPTION C: MANUAL CLINICAL PARAMETERS -->
+                    <div class="input-option-box">
+                        <form id="manual-data-form" class="data-form">
+                            <div class="form-section-title">Option 3: Manual Clinical Parameters</div>
+                            <div class="form-grid-3">
+                                <div class="input-field">
+                                    <label>HR [bpm]</label>
+                                    <input type="number" id="input-hr" value="115" min="30" max="250">
                                 </div>
-                                <div class="text-right">
-                                    <button id="btn-ack" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs tracking-wider rounded transition-colors uppercase">
-                                        Acknowledge Alarm
-                                    </button>
+                                <div class="input-field">
+                                    <label>MAP [mmHg]</label>
+                                    <input type="number" id="input-map" value="62" min="20" max="180">
+                                </div>
+                                <div class="input-field">
+                                    <label>SpO2 [%]</label>
+                                    <input type="number" id="input-spo2" value="92" min="50" max="100">
+                                </div>
+                                <div class="input-field">
+                                    <label>Resp Rate</label>
+                                    <input type="number" id="input-resp" value="28" min="5" max="60">
+                                </div>
+                                <div class="input-field">
+                                    <label>Temp [°C]</label>
+                                    <input type="number" id="input-temp" value="38.9" step="0.1">
+                                </div>
+                                <div class="input-field">
+                                    <label>Lactate</label>
+                                    <input type="number" id="input-lactate" value="3.4" step="0.1">
                                 </div>
                             </div>
 
-                            <!-- Dashboard 3 Panels layout -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <!-- Vitals list panel -->
-                                <div class="bg-slate-900/30 border border-slate-800/40 rounded-xl p-4 flex flex-col justify-between">
-                                    <h4 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-3">Live Telemetry</h4>
-                                    <div class="space-y-3">
-                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
-                                            <span class="text-slate-400 text-sm">Heart Rate</span>
-                                            <span id="val-hr" class="font-bold text-slate-200">108 bpm</span>
-                                        </div>
-                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
-                                            <span class="text-slate-400 text-sm">MAP</span>
-                                            <span id="val-map" class="font-bold text-slate-200">74 mmHg</span>
-                                        </div>
-                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
-                                            <span class="text-slate-400 text-sm">Temperature</span>
-                                            <span id="val-temp" class="font-bold text-slate-200">38.2 °C</span>
-                                        </div>
-                                        <div class="flex justify-between border-b border-slate-800 pb-1.5">
-                                            <span class="text-slate-400 text-sm">Respiration</span>
-                                            <span id="val-resp" class="font-bold text-slate-200">22 /min</span>
-                                        </div>
-                                        <div class="flex justify-between pb-1">
-                                            <span class="text-slate-400 text-sm">SpO2</span>
-                                            <span id="val-spo2" class="font-bold text-slate-200">93%</span>
-                                        </div>
-                                    </div>
-                                    <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800 mt-4">
-                                        <div class="text-slate-400 text-xs">Clinical Recommendation:</div>
-                                        <p id="clinical-rec" class="text-amber-300/90 text-xs mt-1 leading-relaxed">Consider repeating lactate measurement.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Risk Timeline Chart -->
-                                <div class="bg-slate-900/30 border border-slate-800/40 rounded-xl p-4 flex flex-col col-span-2">
-                                    <h4 class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-2">Rolling Sepsis Risk Timeline</h4>
-                                    <div class="relative h-[220px]">
-                                        <canvas id="timelineChart"></canvas>
-                                    </div>
-                                </div>
+                            <div class="form-actions" style="margin-top: 0.5rem;">
+                                <button type="button" class="btn secondary-btn full-width" onclick="submitManualData()">
+                                    Evaluate Manual Vitals
+                                </button>
                             </div>
+                        </form>
+                    </div>
 
-                            <div class="bg-slate-900/30 border border-slate-800/40 rounded-xl p-4">
-                                <div class="flex items-center justify-between mb-4 flex-wrap">
-                                    <h4 class="text-xs font-bold text-teal-400 uppercase tracking-wider">Integrated Gradients Local Attribution Analysis</h4>
-                                    <div class="flex items-center space-x-2">
-                                        <label class="text-[10px] text-slate-400 font-semibold uppercase">Explanation Step:</label>
-                                        <select id="explanation-history-step" class="bg-slate-950 text-teal-300 text-xs px-2 py-1 border border-teal-500/25 rounded outline-none cursor-pointer">
-                                            <option value="11">Current Hour (Latest)</option>
-                                            <option value="10">1 Hour Ago</option>
-                                            <option value="9">2 Hours Ago</option>
-                                            <option value="8">3 Hours Ago</option>
-                                            <option value="7">4 Hours Ago</option>
-                                            <option value="6">5 Hours Ago</option>
-                                            <option value="5">6 Hours Ago</option>
-                                            <option value="4">7 Hours Ago</option>
-                                            <option value="3">8 Hours Ago</option>
-                                            <option value="2">9 Hours Ago</option>
-                                            <option value="1">10 Hours Ago</option>
-                                            <option value="0">11 Hours Ago</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="attribution-bars">
-                                    <!-- Dynamic bars -->
-                                </div>
-                            </div>
+                </div>
+            </div>
+
+            <!-- RISK OVERVIEW & CLINICAL ALERT HERO ROW -->
+            <div class="hero-grid">
+                
+                <!-- SEPSIS RISK SCORE GAUGE -->
+                <div class="glass-card risk-gauge-card">
+                    <h2 class="card-title">BiLSTM Model Prediction</h2>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 200 200">
+                            <circle class="gauge-bg" cx="100" cy="100" r="80"></circle>
+                            <circle id="gauge-fill" class="gauge-fill" cx="100" cy="100" r="80" stroke-dasharray="502" stroke-dashoffset="502"></circle>
+                        </svg>
+                        <div class="gauge-center">
+                            <div id="risk-score-value" class="risk-score-num">0.0%</div>
+                            <div id="risk-score-label" class="risk-level-badge level-low">SAFE CONTROL</div>
+                        </div>
+                    </div>
+                    <div class="gauge-meta">
+                        <div class="meta-item">
+                            <span>Selected Champion</span>
+                            <strong id="model-name-val">BiLSTM (391 Features)</strong>
+                        </div>
+                        <div class="meta-item">
+                            <span>Evaluated Observations</span>
+                            <strong id="obs-count-val">12 Hours</strong>
                         </div>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
 
-    <!-- Script imports -->
-    <script src="/app.js"></script>
+                <!-- CLINICAL ALERT & DECISION SUPPORT PANEL -->
+                <div class="glass-card alert-support-card">
+                    <div class="card-header-flex">
+                        <h2 class="card-title">Clinical Decision Support</h2>
+                        <span id="alert-priority-tag" class="priority-tag tag-normal">STABLE</span>
+                    </div>
+
+                    <div id="alert-banner" class="alert-banner banner-normal">
+                        <div class="banner-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                        <div class="banner-text">
+                            <h3 id="alert-title">Normal Physiological Profile</h3>
+                            <p id="alert-desc">Sepsis risk probability is within safe baseline thresholds. Continue standard ICU protocol monitoring.</p>
+                        </div>
+                    </div>
+
+                    <div class="recommendations-box">
+                        <h3>Recommended Clinical Actions:</h3>
+                        <ul id="recommendations-list">
+                            <li>Maintain continuous vital telemetry monitoring.</li>
+                            <li>Re-evaluate laboratory measurement panels at next scheduled draw.</li>
+                        </ul>
+                    </div>
+
+                    <div class="vitals-quick-pills">
+                        <div class="pill"><span class="pill-label">HR</span> <strong id="pill-hr">80 bpm</strong></div>
+                        <div class="pill"><span class="pill-label">SpO2</span> <strong id="pill-spo2">98%</strong></div>
+                        <div class="pill"><span class="pill-label">MAP</span> <strong id="pill-map">85 mmHg</strong></div>
+                        <div class="pill"><span class="pill-label">Temp</span> <strong id="pill-temp">37.0 °C</strong></div>
+                        <div class="pill"><span class="pill-label">WBC</span> <strong id="pill-wbc">7.5 k/µL</strong></div>
+                        <div class="pill"><span class="pill-label">Lactate</span> <strong id="pill-lactate">1.1 mmol/L</strong></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- INTERACTIVE GRAPH PANELS -->
+            <div class="charts-grid">
+                
+                <!-- CHART 1: SEPSIS RISK TIMELINE -->
+                <div class="glass-card chart-card">
+                    <div class="chart-header">
+                        <h3>Sepsis Risk Probability Trajectory</h3>
+                        <div class="legend-badges">
+                            <span class="badge risk-line">BiLSTM Risk Probability</span>
+                            <span class="badge thresh-line">Critical Threshold (70%)</span>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="riskTimelineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- CHART 2: VITAL SIGNS TRAJECTORY -->
+                <div class="glass-card chart-card">
+                    <div class="chart-header">
+                        <h3>Hemodynamic & Respiratory Trends</h3>
+                        <div class="vital-toggles">
+                            <button class="v-toggle active" data-vital="HR">HR</button>
+                            <button class="v-toggle active" data-vital="MAP">MAP</button>
+                            <button class="v-toggle active" data-vital="Resp">Resp</button>
+                            <button class="v-toggle" data-vital="Temp">Temp</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="vitalsTrendChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- EXPLAINABILITY & ATTRIBUTION PANEL -->
+            <div class="glass-card xai-card">
+                <div class="chart-header">
+                    <div>
+                        <h3>Integrated Gradients Feature Attribution (XAI)</h3>
+                        <p class="sub-text">Top clinical features driving BiLSTM prediction for the tested dataset</p>
+                    </div>
+                    <span class="xai-badge">Captum Integrated Gradients</span>
+                </div>
+
+                <div class="xai-grid">
+                    <div class="chart-wrapper">
+                        <canvas id="xaiBarChart"></canvas>
+                    </div>
+                    <div class="xai-insights">
+                        <h4>Tested Dataset Feature Impact:</h4>
+                        <div id="xai-insights-content" class="insights-list">
+                            <div class="insight-item positive">
+                                <strong>Feature Attribution Calculated:</strong> Model evaluates 391 feature dimensions in real-time.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 2: PROJECT BENCHMARK REPORT -->
+        <section id="report-tab" class="tab-content">
+            <div class="glass-card full-report-card">
+                <div class="report-header">
+                    <div>
+                        <h2>SEPSIS AI — System Architecture & Model Benchmark Report</h2>
+                        <p class="sub-text">Complete Project Report & Validation Leaderboard (391 Feature Pipeline)</p>
+                    </div>
+                    <button class="btn secondary-btn" onclick="window.print()">Print Report</button>
+                </div>
+
+                <div class="report-section">
+                    <h3>1. Executive Summary & Clinical Impact</h3>
+                    <p>Sepsis is a life-threatening condition where delayed medical intervention dramatically increases mortality. **SEPSIS AI** is a state-of-the-art Clinical Decision Support System trained on 40,336 ICU patients (1.55M hourly records) from the PhysioNet 2019 Challenge dataset. The system engineered **391 clinical features** and trained deep temporal neural networks to issue alerts hours before clinical manifestation.</p>
+                </div>
+
+                <div class="report-metrics-grid">
+                    <div class="metric-card">
+                        <span class="m-title">Unique Patients</span>
+                        <strong class="m-val">10,616</strong>
+                        <span class="m-sub">Cohort A & B Dataset</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="m-title">Feature Dimensions</span>
+                        <strong class="m-val">391</strong>
+                        <span class="m-sub">Vitals, Labs, Slopes, Sparsity</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="m-title">Sequence Tensors</span>
+                        <strong class="m-val">1,330,534</strong>
+                        <span class="m-sub">3D NPZ Sliding Windows</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="m-title">BiLSTM Train Accuracy</span>
+                        <strong class="m-val">81.84%</strong>
+                        <span class="m-sub">AUROC: 0.9310 | Sens: 92.71%</span>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>2. Complete Model Performance Leaderboard</h3>
+                    <div class="table-responsive">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Model Architecture</th>
+                                    <th>Feature Schema</th>
+                                    <th>Accuracy</th>
+                                    <th>Sensitivity (Recall)</th>
+                                    <th>Specificity</th>
+                                    <th>Test AUROC</th>
+                                    <th>Test AUPRC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="highlight-row">
+                                    <td><strong>BiLSTM Champion (w12_h0)</strong></td>
+                                    <td>391 Sequential</td>
+                                    <td>81.84%</td>
+                                    <td>92.71%</td>
+                                    <td>81.59%</td>
+                                    <td><strong>0.9310</strong></td>
+                                    <td><strong>0.2054</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>XGBoost Classifier</td>
+                                    <td>391 Tabular</td>
+                                    <td>91.36%</td>
+                                    <td>34.83%</td>
+                                    <td>84.49%</td>
+                                    <td>0.8654</td>
+                                    <td>0.0853</td>
+                                </tr>
+                                <tr>
+                                    <td>LightGBM Classifier</td>
+                                    <td>391 Tabular</td>
+                                    <td>89.50%</td>
+                                    <td>42.38%</td>
+                                    <td>83.10%</td>
+                                    <td>0.7738</td>
+                                    <td>0.0874</td>
+                                </tr>
+                                <tr>
+                                    <td>Random Forest</td>
+                                    <td>391 Tabular</td>
+                                    <td>88.90%</td>
+                                    <td>36.36%</td>
+                                    <td>82.40%</td>
+                                    <td>0.7759</td>
+                                    <td>0.0874</td>
+                                </tr>
+                                <tr>
+                                    <td>GRU Classifier</td>
+                                    <td>391 Sequential</td>
+                                    <td>79.20%</td>
+                                    <td>54.80%</td>
+                                    <td>80.50%</td>
+                                    <td>0.7922</td>
+                                    <td>0.1157</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>3. Early Warning Lead-Time Analysis</h3>
+                    <p>The BiLSTM sequential champion model maintains strong early detection capability up to 6 hours ahead of clinical sepsis onset:</p>
+                    <ul>
+                        <li><strong>0-Hour Current Detection (w12_h0):</strong> Test AUROC = 0.7899, Recall = 56.69%</li>
+                        <li><strong>3-Hour Advance Warning (w12_h3):</strong> Test AUROC = 0.7666, Recall = 58.33%</li>
+                        <li><strong>6-Hour Advance Warning (w12_h6):</strong> Test AUROC = 0.7529, Recall = 28.47%</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 3: THRESHOLDS & CONTROLS -->
+        <section id="settings-tab" class="tab-content">
+            <div class="glass-card settings-card">
+                <h2 class="card-title">User-Defined Clinical Alert Thresholds</h2>
+                <p class="sub-text">Customize notification trigger sensitivity and model inference parameters</p>
+
+                <div class="settings-form">
+                    <div class="control-group">
+                        <div class="control-label-flex">
+                            <label for="thresh-critical">Critical Sepsis Alert Threshold (Risk ≥ %):</label>
+                            <span id="thresh-critical-val" class="val-badge alert-high">70%</span>
+                        </div>
+                        <input type="range" id="thresh-critical" min="40" max="90" value="70" step="5" oninput="updateSettingsUI()">
+                        <p class="help-text">Triggers urgent RED bedside alarm and immediate physician alert.</p>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label-flex">
+                            <label for="thresh-warning">Warning / Moderate Risk Threshold (Risk ≥ %):</label>
+                            <span id="thresh-warning-val" class="val-badge alert-warn">40%</span>
+                        </div>
+                        <input type="range" id="thresh-warning" min="20" max="65" value="40" step="5" oninput="updateSettingsUI()">
+                        <p class="help-text">Triggers YELLOW warning badge for bedside nurse review.</p>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label-flex">
+                            <label for="horizon-select">Default Early Warning Horizon:</label>
+                        </div>
+                        <select id="horizon-select" class="custom-select">
+                            <option value="0">0h Current Hour Detection (w12_h0)</option>
+                            <option value="3">3-Hour Advance Early Warning (w12_h3)</option>
+                            <option value="6">6-Hour Advance Early Warning (w12_h6)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn primary-btn" onclick="saveSettings()">Save Configuration</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <p>SEPSIS AI — Clinical Decision Support System | BiLSTM Champion Engine (391 Features)</p>
+    </footer>
+
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
 </body>
 </html>

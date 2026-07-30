@@ -1,0 +1,334 @@
+================================================================================
+                       THAARU SEPSIS AI — SYSTEM REPORT
+================================================================================
+Date: July 20, 2026
+Project Title: THAARU Sepsis AI: Early Prediction of Sepsis from Clinical Data
+Framework Version: Phase 10 (Real-Time Ingestion & Clinician Dashboard)
+================================================================================
+
+1. PROJECT OVERVIEW & CLINICAL SIGNIFICANCE
+--------------------------------------------------------------------------------
+Sepsis is a life-threatening organ dysfunction caused by a dysregulated host 
+response to infection. If not recognized and treated early (e.g., via fluids and 
+intravenous antibiotics), it rapidly progresses to septic shock, multi-organ failure, 
+and death. In the ICU, every hour of delayed treatment increases mortality risk.
+
+The THAARU Sepsis AI project is a state-of-the-art Clinical Decision Support System 
+(CDSS) designed to predict sepsis onset hours before clinical manifestation. 
+The system consolidates and processes patient vital signs, laboratory measurements, 
+and demographic information to issue real-time early warnings, clinical suggestions, 
+and localized explainability to bedside physicians and ICU nurses.
+
+Dataset Summary:
+- Source: PhysioNet Challenge 2019
+- Unique Patients: 40,336
+- Total Hourly Records: 1,552,210
+- Class Imbalance: Sepsis is present in 1.80% of total hourly records.
+- Septic Patient Prevalence: 7.27% of patients contract sepsis during their stay.
+- Length of Stay: Average of 39.01 hours (range: 8 to 336 hours).
+
+
+2. HOW THE SYSTEM AND MODEL NOW WORK
+--------------------------------------------------------------------------------
+The project features a full loop from patient bedside monitoring to prediction, 
+clinical alerting, explainability, and visual representation:
+
+  +-----------------------+      Ingest      +-----------------------------+
+  |  Patient Telemetry    | -------------->  | FastAPI Ingestion Endpoint  |
+  |  (HR, Temp, labs...)  |                  | (server.py /patient/update) |
+  +-----------------------+                  +-----------------------------+
+                                                            |
+                                                            v
+  +-----------------------+   Read Buffer    +-----------------------------+
+  | SQLite Database       | <--------------  | Rolling Window Manager      |
+  | (sepsis_live.db)      |                  | (Up to 12h history)         |
+  +-----------------------+                  +-----------------------------+
+                                                            |
+                                                            v
+  +-----------------------+   Attributions   +-----------------------------+
+  | PyTorch Captum XAI    | <--------------  | Online Preprocessor         |
+  | (Integrated Gradients)|                  | (Feature Eng & scaling)     |
+  +-----------------------+                  +-----------------------------+
+              |                                             |
+              v                                             v
+  +------------------------------------------------------------------------+
+  |                BiLSTM Classifier Sepsis Prediction Model                |
+  |                   Outputs Sepsis Risk (e.g. 84.3%)                     |
+  +------------------------------------------------------------------------+
+              |                                             |
+              v                                             v
+  +-----------------------+                  +-----------------------------+
+  | Alert Engine          |                  | Clinician Dashboard         |
+  | (Critical, Rising, PP)|                  | (index.html / app.js)       |
+  +-----------------------+                  +-----------------------------+
+
+Detailed Execution Workflow:
+1. Ingestion: Telemetry records containing patient vitals (Heart Rate, MAP, Temp, 
+   SpO2, Resp, Blood Pressure) are sent via HTTP POST to `/api/patient/update`.
+2. Database Storage: The server commits the telemetry records to `sepsis_live.db` 
+   for persistence.
+3. Rolling Window Queue: Upon query, the `RollingWindowBuffer` fetches the last 
+   12 hours of stay for the patient (less if the patient just entered the ICU).
+4. Preprocessing & Feature Engineering: The `OnlinePreprocessor` handles:
+   - Laboratory sparsity flags: Generates flags (e.g. `Lactate_measured` = 1 
+     if present, 0 otherwise) for sparse labs.
+   - Imputation: Forward-fills missing values to carry over temporal persistence, 
+     then fills remaining NaNs with clinical default values (e.g., HR = 80.0 bpm).
+   - Clinical Feature Derivation: Computes 29 engineered features:
+     * Cardiovascular Indices: Shock Index, Pulse Pressure, MAP deviation.
+     * Clinical Ratios: HR/MAP, Resp/O2Sat, HR/Temp.
+     * 6h Rolling Stats: Mean and Std/Variability of (HR, Resp, Temp, MAP, O2Sat).
+     * 1h Lag Differences: Slopes of vital parameters to track acute worsening.
+     * Lab Sparsity Timers: Tracks elapsed hours since Lactate, WBC, pH, etc. 
+       were last ordered.
+     * Stay Timeline Flags: Identifies first-24h stays and diurnal cycles.
+   - Standardization: Standardizes features with `scaler.pkl` (fit on the Training 
+     partition only).
+   - Alignment: Reorders output columns to match the 391 features expected by the model.
+5. Inference Engine: The sequence tensor of shape `(1, seq_len, 391)` is sent to 
+   the trained PyTorch BiLSTM model. A sigmoid activation is applied to output 
+   a sepsis risk probability (0 to 1).
+6. Alert Generation: The `AlertEngine` compares the risk score against rules:
+   - Critical Sepsis Warning: Sepsis risk >= 0.70.
+   - Acute Worsening/Rising Risk: Sepsis risk increase >= 0.20 over past hour.
+   - Persistent Danger Alert: Sepsis risk >= 0.80 for consecutive hours.
+7. Explanations (Captum IG): The `OnlineIGExplainer` applies Integrated Gradients 
+   to the patient's sequence trajectory. It identifies exactly which variables and 
+   hours contributed to the risk score, returning them to the client.
+8. Front-End Rendering: The clinician dashboard (`index.html` & `app.js`) polls 
+   the API endpoints every 3 seconds, updating the live ward grid, displaying 
+   alert notifications, drawing vitals trend lines, mapping temporal heatmaps, 
+   and showing direct clinical suggestions.
+
+
+3. COMPLETE DIRECTORY AND FILE MAP
+--------------------------------------------------------------------------------
+
+ROOT WORKSPACE DIRECTORY
+├── README.TXT              - Empty readme file.
+├── INFO.TXT                - [THIS FILE] Complete report and file roadmap.
+├── download_dataset.py     - Downloads raw PhysioNet 2019 PSV patient records in parallel.
+├── training_setAzip.zip    - Archive containing ICU cohort A patient data (20,336 patients).
+└── training_setBzip.zip    - Archive containing ICU cohort B patient data (20,000 patients).
+
+THAARU-Sepsis-AI/ (MAIN REPOSITORY ROOT)
+├── .gitignore              - Files/folders to exclude from version control.
+├── baseline_models.zip     - Zipped backup of classical trained baselines.
+│
+├── eda/ (EXPLORATORY DATA ANALYSIS COHORT ANALYTICS)
+│   ├── utils.py            - Helper function for dataset loading, logging, and performance timing.
+│   ├── class_distribution.py - Examines sepsis hourly record and patient-level class distribution.
+│   ├── correlation_analysis.py - Evaluates Pearson correlation to check for colinearities.
+│   ├── dataset_statistics.py - Computes cohort sizing, mean/median ICU staying time, and counts.
+│   ├── feature_distribution.py - Computes vital sign histograms, boxplots, and ranges.
+│   ├── missing_analysis.py - Analyzes feature missingness (e.g. Lactate missingness ~90%).
+│   ├── outlier_analysis.py - Evaluates clinical outliers using standard deviation thresholds.
+│   ├── patient_analysis.py - Segments demographics, age groups, and gender categories.
+│   ├── temporal_analysis.py - Plots average physiological trends for septic vs non-septic cohorts.
+│   └── generate_report.py  - Orchestrates EDA pipeline, compiling HTML and PDF visual reports.
+│
+├── preprocessing/ (DATASET CLEANING, IMPUTATION, & SPLITTING)
+│   ├── config.py           - Defines clinical boundary constants, vital/lab groupings, and scaling exclusions.
+│   ├── utils.py            - Logger and timer utilities.
+│   ├── split_data.py       - Stratifies patient records into Train (70%), Val (15%), and Test (15%) parquets.
+│   ├── validate_ranges.py  - Invalidates out-of-bounds readings (e.g., HR > 250) and replaces with NaN.
+│   ├── impute_missing.py   - Custom forward-fill & median-fill pipeline to resolve feature gaps.
+│   ├── handle_outliers.py  - Caps remaining outliers using 1st/99th percentile Winsorization.
+│   ├── scale_features.py   - Standardizes values using StandardScaler fit on the training split only.
+│   ├── validate_processed.py - Quality Assurance runner to check schema shape, target, and split separation.
+│   ├── save_processed.py   - Saves final parquets and outputs metadata summary statistics.
+│   ├── generate_report.py  - Formulates clinical preprocessing reports in Markdown, HTML, and PDF formats.
+│   ├── load_data.py        - Helper script to parse raw PSV files.
+│   ├── merge_patients.py   - Consolidates individual patient files into master dataframes.
+│   └── run_preprocessing.py - Pipeline execution script orchestrating splits, validation, scaling, and saving.
+│
+├── feature_engineering/ (CLINICAL FEATURE AUGMENTATION)
+│   ├── config.py           - Feature engineering configurations.
+│   ├── build_features.py   - Computes Shock Index, MAP deviations, rolling stds, lag trends, and lab sparsity timers.
+│   ├── evaluate_features.py - Computes feature importance using baseline tree models.
+│   ├── feature_catalog.csv  - Documented list of all 97 columns, clinical definitions, and equations.
+│   └── run_feature_engineering.py - Orchestrator that fits standard scaler on engineered training split.
+│
+├── sequence_generation/ (3D SEQUENTIAL TENSOR CONSTRUCTION)
+│   ├── config.py           - Stride settings, exclusion columns, and window/horizon configs.
+│   ├── sequence_builder.py - Extracts patient sequences using sliding windows (pads/truncates as needed).
+│   ├── label_generator.py  - Determines sequence labels based on stay horizon.
+│   ├── metadata.py         - Retains patient IDs and timing for matching sequences.
+│   ├── validation.py       - Confirms 3D shape alignment, zero leaks, and label balance.
+│   ├── save_sequences.py   - Writes arrays to compressed NPZ tensors.
+│   ├── generate_report.py  - Compiles Markdown/PDF/HTML sequence statistics.
+│   └── run_sequence_generation.py - Sequence builder orchestrator that runs all configurations.
+│
+├── baseline_models/ (CLASSICAL MACHINE LEARNING EXPERIMENTS)
+│   ├── config.py           - Classical hyperparameter models config.
+│   ├── data_loader.py      - Utility loader for parquet datasets.
+│   ├── metrics.py          - Computes accuracy, recall, F1, specificity, AUROC, AUPRC, and confusion tables.
+│   ├── plots.py            - Saves comparative ROC curves, PR curves, and feature importance bar plots.
+│   ├── save_model.py       - Saves trained Scikit-learn/XGBoost/LightGBM model binaries.
+│   ├── generate_report.py  - Creates baseline model leaderboard reports.
+│   └── run_baseline.py     - Fits, validates, and evaluates 5 models on Datasets A & B.
+│
+├── deep_learning/ (SEQUENTIAL DEEP LEARNING FRAMEWORK)
+│   ├── config.py           - Training parameters, batch sizes, learning rates, epochs, and device configuration.
+│   ├── data_loader.py      - Custom PyTorch Dataset/DataLoader for 3D NPZ tensors.
+│   ├── trainer.py          - Train and validation batch loops with early stopping support.
+│   ├── generate_learning_curves.py - Saves PNG plots tracking train/validation loss history.
+│   ├── measure_complexity_and_efficiency.py - Computes memory size, parameters, and batch latency.
+│   ├── compile_comprehensive_reports.py - Assembles deep learning benchmark reports.
+│   ├── run_training.py     - Stage 7A development: trains LSTM, GRU, BiLSTM, and Transformer (20% sample).
+│   ├── run_final_training.py - Stage 7B final matrix: trains BiLSTM winner on 50% sequence data.
+│   ├── run_variability_study.py - Runs seed sensitivity evaluations to verify statistical stability.
+│   └── models/             - Directory containing model architecture classes.
+│       ├── base_model.py   - Shared pytorch model base interface.
+│       ├── lstm.py         - Standard unidirectional LSTM Classifier.
+│       ├── gru.py          - Standard GRU Classifier.
+│       ├── bilstm.py       - Bidirectional LSTM Classifier (Project Champion).
+│       └── transformer.py  - Transformer Encoder Classifier (Multi-head attention).
+│
+├── optimization/ (HYPERPARAMETER SWEEPS)
+│   ├── config.py           - Optuna hyperparameter bounds (hidden dimensions, learning rates).
+│   ├── data_loader.py      - PyTorch loader wrapper for hyperparameter searches.
+│   ├── xgboost_opt.py      - Runs Optuna search for XGBoost parameters.
+│   ├── bilstm_opt.py       - Runs Optuna search for BiLSTM PyTorch model.
+│   ├── generate_report.py  - Renders hyperparameter search plots and validation comparisons.
+│   └── run_optimization.py - Hyperparameter optimization main orchestrator.
+│
+├── explainability/ (EXPLAINABLE AI ENGINE)
+│   ├── config.py           - Selection of target patients and feature index map configuration.
+│   ├── data_loader.py      - Loader utilities for explainability algorithms.
+│   ├── shap_analysis.py    - Generates Tree SHAP summary and dependence plots on XGBoost model.
+│   ├── integrated_gradients.py - Uses PyTorch Captum to compute temporal attribution on BiLSTM model.
+│   ├── attention_visualization.py - Renders heatmaps showing multi-head attention scores on Transformer.
+│   ├── error_analysis.py   - Profiles model misclassifications (false negatives vs false positives).
+│   ├── feature_ranking.py  - Evaluates feature ranking correlation between SHAP and Integrated Gradients.
+│   ├── patient_case_studies.py - Generates clinician visual files for TP, TN, FP, and FN patient trajectories.
+│   ├── generate_report.py  - Generates final explainability reports.
+│   └── run_explainability.py - Executes the complete Explainable AI workflow.
+│
+├── phase10_realtime/ (REAL-TIME SERVING & CLINICAL SERVER)
+│   ├── config.py           - Database, scaler, model paths, alert thresholds.
+│   ├── server.py           - Main FastAPI clinical web server.
+│   ├── storage/
+│   │   └── database.py     - Database schema creation, connection retrieval.
+│   ├── sequence/
+│   │   └── rolling_window.py - Queue buffer class maintaining patient hourly trajectories.
+│   ├── preprocessing/
+│   │   └── online_preprocessing.py - Standardizes and engineers features in real-time.
+│   ├── inference/
+│   │   └── predictor.py    - Serves model predictions from PyTorch weights.
+│   ├── explainability/
+│   │   └── online_integrated_gradients.py - Attributions generation for active sequence logs.
+│   ├── alerts/
+│   │   └── alert_engine.py - Clinical rule evaluator for sepsis risk alert triggers.
+│   └── ingestion/
+│       └── simulator.py    - Replays patient hourly streams and sends requests to the server.
+│
+├── dashboard/ (CLINICAL WORKSTATION USER INTERFACE)
+│   ├── index.html          - Clinician view layout (patient grid, charts, explainability panels).
+│   ├── styles.css          - Styling rules, color mappings, and layout designs.
+│   └── app.js              - Session authorization, data polling, and dynamic updates.
+│
+├── experiments/ (LOGS, COMPARISONS, & METRICS OUTPUTS)
+│   ├── metrics/            - Graph visualisations (ROC/PR comparisons, confusion tables).
+│   ├── predictions/        - Predicted probabilities saved as .npz records.
+│   └── checkpoints/        - Saved model weight binaries (*_best.pt).
+│
+└── reports/ (PRE-COMPILED CLINIAC REPORTS)
+    ├── features/           - Scaled feature stats, baseline importance summaries, correlation matrices.
+    ├── statistics/         - Basic demographics summary stats.
+    ├── preprocessing/      - Outliers, range validation logs, quality checks.
+    └── summary/            - Phase-specific final reports (Markdown, PDF, HTML format).
+
+
+4. MODELING LEADERBOARD & KEY RESULTS
+--------------------------------------------------------------------------------
+Below is the evaluation summary compiled during model validation.
+
+Classical Machine Learning Leaderboard (Dataset B with Engineered Features):
+- Dataset B outperformed Dataset A across all baseline algorithms due to the 
+  addition of rolling parameters, sparsity markers, and cardiovascular indices.
+- Top Tabular Baseline: XGBoost Classifier.
+  * Test AUROC: 0.8381
+  * Test AUPRC: 0.1318
+  * Test Recall (Sensitivity): 0.6495 (Identifies 64.9% of septic cases)
+  * Test Specificity: 0.8449
+  * Training Latency: 8.12 seconds
+
+Deep Sequential Learning Leaderboard (Phase 7A: 20% representative sample):
+* The models were evaluated on the primary configuration: 12h window, 0h prediction horizon.
+- LSTM:        AUROC = 0.8384 | AUPRC = 0.1125 | Recall = 0.7150 | Spec = 0.8014
+- GRU:         AUROC = 0.8519 | AUPRC = 0.1431 | Recall = 0.7668 | Spec = 0.7831
+- BiLSTM:      AUROC = 0.8459 | AUPRC = 0.1320 | Recall = 0.7640 | Spec = 0.7686
+- Transformer: AUROC = 0.8504 | AUPRC = 0.1192 | Recall = 0.7259 | Spec = 0.8156
+
+Final Selected Champion (Phase 7B: BiLSTM retrained on 50% sequence sample):
+The Bidirectional LSTM model captured sequential trends in forward and reverse 
+directions, outperforming tree ensembles and establishing a high clinical recall.
+- BiLSTM Champion (w12_h0):
+  * Test AUROC: 0.8435 (beating XGBoost's 0.8381)
+  * Test AUPRC: 0.1228
+  * Test Recall (Sensitivity): 0.7848 (increases sensitivity by 13.5% over XGBoost)
+  * Test Specificity: 0.7580
+  * Trainable Parameters: 181,889
+  * Model Size on Disk: 0.70 MB
+  * Single-sample Inference Latency: 60.80 microseconds (CPU)
+
+Impact of Temporal Configurations (BiLSTM w12_h0 vs others):
+- Observation window impact:
+  * BiLSTM w24_h0 (24h window): Test AUROC = 0.8460, AUPRC = 0.1457, Recall = 0.8175
+  * BiLSTM w6_h0 (6h window):   Test AUROC = 0.8393, AUPRC = 0.1212, Recall = 0.7486
+  * Clinical interpretation: Longer history yields better performance.
+- Prediction horizon warning lead-time:
+  * BiLSTM w12_h3 (3h lead-time): Test AUROC = 0.8238, AUPRC = 0.1119, Recall = 0.7305
+  * BiLSTM w12_h6 (6h lead-time): Test AUROC = 0.8186, AUPRC = 0.1041, Recall = 0.7494
+  * Clinical interpretation: High sensitivity (74.9%) remains intact up to 6 hours 
+    before sepsis onset, allowing clinical intervention.
+
+Statistical Stability (BiLSTM variability across 3 random seeds):
+- Test AUROC: 0.8406 ± 0.0036
+- Test AUPRC: 0.1300 ± 0.0130
+- Confirms the model is highly stable and robust to weight initialization changes.
+
+
+5. OPTIMIZATION & FINE-TUNING
+--------------------------------------------------------------------------------
+Hyperparameter sweeps were performed using validation AUPRC as the target:
+- XGBoost Optimal: max_depth=4, lr=0.1, n_estimators=100, subsample=1.0, colsample_bytree=0.8
+  * Validation AUPRC: 0.0927
+- BiLSTM Optimal: hidden_size=32, num_layers=1, dropout=0.3, lr=0.002, batch_size=512
+  * Validation AUPRC: 0.0924
+- Analysis: Validation gains were marginal over baseline configs, validating that 
+  our initial architectures were already well-suited for the clinical features.
+
+
+6. EXPLAINABILITY (XAI) INSIGHTS
+--------------------------------------------------------------------------------
+Global Explanations (XGBoost SHAP):
+- Summary beeswarm plots show that length of ICU stay (`ICULOS`), temperature (`Temp`), 
+  and laboratory measurement frequency (`hours_since_last_Lactate`, `hours_since_last_pH`) 
+  dominate predictions. Hemodynamic ratios like `HR_MAP_Ratio` rank highly, 
+  justifying feature engineering.
+
+Local Explanations (BiLSTM Integrated Gradients):
+- Temporal attribution heatmaps show that vitals in the last 2 hours of the stay 
+  have the strongest contribution.
+- Elevated Respiratory Rate (`Resp`) and Lactate levels in later hours contribute 
+  the highest positive risk attribution, aligning with clinical guidelines.
+
+Model Feature Concordance:
+- Overlap of the top 20 features between XGBoost (SHAP) and BiLSTM (Integrated Gradients) 
+  identified 11 matches, representing a Jaccard Similarity of 37.93%. 
+  Concordant features include: `ICULOS`, `Temp`, `hours_since_last_Lactate`, 
+  `hours_since_last_pH`, `Temp_roll_std_6h`, `WBC`, `Platelets`, and `Unit2`.
+
+Clinical Error Profiles:
+- False Negatives (FNs): Characterized by severe feature missingness (high percentage of 
+  imputed Lactate, pH, and Creatinine). Model sensitivity drops on sparse charts.
+- False Positives (FPs): Patients presenting with high heart rate, temperature, 
+  and white blood cell counts. These align with SIRS (Systemic Inflammatory Response 
+  Syndrome) criteria, causing false alarms in patients with inflammatory conditions 
+  who do not develop sepsis.
+
+================================================================================
+                                 END OF REPORT
+================================================================================

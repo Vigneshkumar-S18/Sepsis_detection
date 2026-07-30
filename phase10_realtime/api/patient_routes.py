@@ -9,14 +9,18 @@ import numpy as np
 from phase10_realtime.config import DB_PATH
 from phase10_realtime.storage.database import get_db_connection
 from phase10_realtime.sequence.rolling_window import RollingWindowBuffer
+from phase10_realtime.preprocessing.online_preprocessing import OnlinePreprocessor
 from phase10_realtime.inference.predictor import RealTimePredictor
 from phase10_realtime.explainability.online_integrated_gradients import OnlineIGExplainer
 from phase10_realtime.alerts.alert_engine import AlertEngine
+import pandas as pd
+import io
 
 router = APIRouter()
 
 # Instantiate singletons at API initialization
 window_manager = RollingWindowBuffer()
+online_preprocessor = OnlinePreprocessor()
 predictor = RealTimePredictor()
 explainer = OnlineIGExplainer(predictor.model)
 alert_engine = AlertEngine()
@@ -299,3 +303,129 @@ async def get_patient_prediction_history(patient_id: str):
     conn.close()
     
     return [dict(row) for row in rows]
+
+
+class DatasetPayloadModel(BaseModel):
+    file_content: str = ""
+    patient_id: str = "Uploaded_Patient"
+
+
+@router.post("/evaluate_dataset")
+async def evaluate_dataset_input(payload: DatasetPayloadModel):
+    t0 = time.time()
+    content = payload.file_content.trim() if hasattr(payload.file_content, 'trim') else payload.file_content.strip()
+    
+    if not content:
+        raise HTTPException(status_code=400, detail="Empty dataset content provided.")
+        
+    df = None
+    parse_errors = []
+    
+    # 1. Try plain text CSV/PSV/TSV reading
+    try:
+        first_line = content.split('\n')[0] if '\n' in content else content
+        if '\t' in first_line:
+            delimiter = '\t'
+        elif '|' in first_line:
+            delimiter = '|'
+        elif ';' in first_line:
+            delimiter = ';'
+        else:
+            delimiter = ','
+        df = pd.read_csv(io.StringIO(content), sep=delimiter)
+    except Exception as e:
+        parse_errors.append(f"CSV read: {e}")
+        
+    # 2. If CSV failed, try Base64 decoded Excel (.xlsx/.xls)
+    if df is None or df.empty or len(df.columns) < 2:
+        try:
+            import base64
+            decoded_bytes = base64.b64decode(content)
+            df = pd.read_excel(io.BytesIO(decoded_bytes), engine='openpyxl')
+        except Exception as e:
+            parse_errors.append(f"Base64 Excel read: {e}")
+
+    # 3. If Base64 failed, try raw latin1 encoded Excel (.xlsx/.xls)
+    if df is None or df.empty or len(df.columns) < 2:
+        try:
+            df = pd.read_excel(io.BytesIO(content.encode('latin1')), engine='openpyxl')
+        except Exception as e:
+            parse_errors.append(f"Raw Excel read: {e}")
+
+    if df is None or df.empty:
+        raise HTTPException(status_code=400, detail=f"Failed to parse uploaded dataset/Excel content. Errors: {parse_errors}")
+        
+    if df.empty:
+        raise HTTPException(status_code=400, detail="Uploaded dataset contains 0 rows.")
+        
+    # Cap trajectory length to last 24 hours if very long
+    if len(df) > 24:
+        df = df.iloc[-24:].copy()
+        
+    # Run online preprocessing pipeline (391 features)
+    seq = online_preprocessor.preprocess_sequence(df) # shape: (k, 391)
+    
+    # Run step-by-step risk trajectory calculation
+    risk_timeline = []
+    k_len = seq.shape[0]
+    for step in range(1, k_len + 1):
+        step_seq = seq[:step, :]
+        p_risk = predictor.predict_risk(step_seq)
+        risk_timeline.append(float(p_risk))
+        
+    final_risk = risk_timeline[-1] if risk_timeline else 0.0
+    
+    # Calculate Captum Integrated Gradients attributions on the sequence
+    explanation = explainer.attribute_sequence(seq)
+    top_features = explanation["top_features"]
+    
+    # Extract vitals timelines for charts
+    vitals_timeline = {}
+    for col in ["HR", "MAP", "Resp", "Temp", "O2Sat", "WBC", "Lactate", "Creatinine", "SBP", "DBP"]:
+        if col in df.columns:
+            vitals_timeline[col] = df[col].fillna(0).tolist()
+        elif col == "O2Sat" and "SpO2" in df.columns:
+            vitals_timeline["O2Sat"] = df["SpO2"].fillna(0).tolist()
+            
+    # Risk Level & Status
+    if final_risk >= 0.70:
+        risk_level = "Critical"
+        status = "HIGH SEPSIS RISK"
+        recommendations = [
+            "Order STAT Blood Cultures (x2 sets) and Serum Lactate clearance.",
+            "Initiate Broad-Spectrum IV Antibiotics within 1 hour.",
+            "Administer 30 mL/kg IV Crystalloids for fluid resuscitation.",
+            "Notify ICU Attending Physician and alert Rapid Response Team."
+        ]
+    elif final_risk >= 0.40:
+        risk_level = "Warning"
+        status = "MODERATE / RISING RISK"
+        recommendations = [
+            "Re-check vital signs telemetry every 15–30 minutes.",
+            "Review recent CBC, WBC count, and inflammatory markers.",
+            "Assess patient for potential infectious etiology."
+        ]
+    else:
+        risk_level = "Low"
+        status = "STABLE CONTROL"
+        recommendations = [
+            "Maintain continuous vital telemetry monitoring.",
+            "Re-evaluate laboratory measurement panels at next scheduled draw."
+        ]
+        
+    latency_ms = (time.time() - t0) * 1000.0
+    
+    return {
+        "status": "success",
+        "model_name": "BiLSTM Champion Engine (391 Features)",
+        "patient_id": payload.patient_id,
+        "observations_count": k_len,
+        "final_risk": final_risk,
+        "risk_level": risk_level,
+        "alert_status": status,
+        "risk_timeline": risk_timeline,
+        "vitals_timeline": vitals_timeline,
+        "top_features": top_features,
+        "recommendations": recommendations,
+        "latency_ms": latency_ms
+    }

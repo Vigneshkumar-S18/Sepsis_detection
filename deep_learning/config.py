@@ -4,7 +4,8 @@ import torch
 SEED = 42
 
 # Sequence details
-FEATURES = 95  # Total features input to sequential neural networks
+FEATURES = 391  # Total features input to sequential neural networks
+
 
 # Optimizer, Loss, and Scheduler
 OPTIMIZER = "Adam"

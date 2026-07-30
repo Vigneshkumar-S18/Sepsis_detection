@@ -22,16 +22,16 @@
 <body>
 <div class="container">
     <h1>THAARU Sepsis AI — Temporal Sequence Report</h1>
-    <div class="meta">Generated: July 19, 2026</div>
+    <div class="meta">Generated: July 28, 2026</div>
 
     <h2>1. Experiment Dataset Summary</h2>
     <table>
         <tr><th>Config</th><th>Window</th><th>Horizon</th><th>Train</th><th>Val</th><th>Test</th><th>Train +Rate</th></tr>
-        <tr><td>w6_h0</td><td>6h</td><td>+0h</td><td>945,261</td><td>201,222</td><td>204,047</td><td>1.87%</td></tr>
-<tr><td>w12_h0</td><td>12h</td><td>+0h</td><td>776,999</td><td>165,213</td><td>167,979</td><td>1.91%</td></tr>
-<tr><td>w24_h0</td><td>24h</td><td>+0h</td><td>472,453</td><td>100,373</td><td>102,520</td><td>2.48%</td></tr>
-<tr><td>w12_h3</td><td>12h</td><td>+3h</td><td>695,059</td><td>147,719</td><td>150,382</td><td>2.00%</td></tr>
-<tr><td>w12_h6</td><td>12h</td><td>+6h</td><td>615,848</td><td>130,823</td><td>133,352</td><td>2.13%</td></tr>
+        <tr><td>w6_h0</td><td>6h</td><td>+0h</td><td>250,711</td><td>54,473</td><td>53,052</td><td>2.23%</td></tr>
+<tr><td>w12_h0</td><td>12h</td><td>+0h</td><td>206,426</td><td>44,982</td><td>43,558</td><td>2.29%</td></tr>
+<tr><td>w24_h0</td><td>24h</td><td>+0h</td><td>125,533</td><td>27,602</td><td>26,181</td><td>2.91%</td></tr>
+<tr><td>w12_h3</td><td>12h</td><td>+3h</td><td>184,765</td><td>40,335</td><td>38,918</td><td>2.37%</td></tr>
+<tr><td>w12_h6</td><td>12h</td><td>+6h</td><td>163,786</td><td>35,808</td><td>34,404</td><td>2.50%</td></tr>
 
     </table>
 
@@ -39,37 +39,37 @@
     <h3>w6_h0 — Minimal observation: can 6h detect sepsis?</h3>
 <table>
 <tr><th>Split</th><th>Sequences</th><th>Positive</th><th>Negative</th><th>+Rate</th><th>Imbalance</th></tr>
-<tr><td>Train</td><td>945,261</td><td>17,643</td><td>927,618</td><td>1.87%</td><td>52.6:1</td></tr>
-<tr><td>Validation</td><td>201,222</td><td>3,690</td><td>197,532</td><td>1.83%</td><td>53.5:1</td></tr>
-<tr><td>Test</td><td>204,047</td><td>3,803</td><td>200,244</td><td>1.86%</td><td>52.6:1</td></tr>
+<tr><td>Train</td><td>250,711</td><td>5,596</td><td>245,115</td><td>2.23%</td><td>43.8:1</td></tr>
+<tr><td>Validation</td><td>54,473</td><td>1,224</td><td>53,249</td><td>2.25%</td><td>43.5:1</td></tr>
+<tr><td>Test</td><td>53,052</td><td>1,211</td><td>51,841</td><td>2.28%</td><td>42.8:1</td></tr>
 </table>
 <h3>w12_h0 — Standard 12h observation window</h3>
 <table>
 <tr><th>Split</th><th>Sequences</th><th>Positive</th><th>Negative</th><th>+Rate</th><th>Imbalance</th></tr>
-<tr><td>Train</td><td>776,999</td><td>14,827</td><td>762,172</td><td>1.91%</td><td>51.4:1</td></tr>
-<tr><td>Validation</td><td>165,213</td><td>3,061</td><td>162,152</td><td>1.85%</td><td>53.0:1</td></tr>
-<tr><td>Test</td><td>167,979</td><td>3,221</td><td>164,758</td><td>1.92%</td><td>51.1:1</td></tr>
+<tr><td>Train</td><td>206,426</td><td>4,720</td><td>201,706</td><td>2.29%</td><td>42.7:1</td></tr>
+<tr><td>Validation</td><td>44,982</td><td>1,080</td><td>43,902</td><td>2.40%</td><td>40.6:1</td></tr>
+<tr><td>Test</td><td>43,558</td><td>1,009</td><td>42,549</td><td>2.32%</td><td>42.2:1</td></tr>
 </table>
 <h3>w24_h0 — Extended observation: does more history help?</h3>
 <table>
 <tr><th>Split</th><th>Sequences</th><th>Positive</th><th>Negative</th><th>+Rate</th><th>Imbalance</th></tr>
-<tr><td>Train</td><td>472,453</td><td>11,715</td><td>460,738</td><td>2.48%</td><td>39.3:1</td></tr>
-<tr><td>Validation</td><td>100,373</td><td>2,241</td><td>98,132</td><td>2.23%</td><td>43.8:1</td></tr>
-<tr><td>Test</td><td>102,520</td><td>2,576</td><td>99,944</td><td>2.51%</td><td>38.8:1</td></tr>
+<tr><td>Train</td><td>125,533</td><td>3,657</td><td>121,876</td><td>2.91%</td><td>33.3:1</td></tr>
+<tr><td>Validation</td><td>27,602</td><td>871</td><td>26,731</td><td>3.16%</td><td>30.7:1</td></tr>
+<tr><td>Test</td><td>26,181</td><td>739</td><td>25,442</td><td>2.82%</td><td>34.4:1</td></tr>
 </table>
 <h3>w12_h3 — Early warning: 3-hour advance prediction</h3>
 <table>
 <tr><th>Split</th><th>Sequences</th><th>Positive</th><th>Negative</th><th>+Rate</th><th>Imbalance</th></tr>
-<tr><td>Train</td><td>695,059</td><td>13,887</td><td>681,172</td><td>2.00%</td><td>49.0:1</td></tr>
-<tr><td>Validation</td><td>147,719</td><td>2,821</td><td>144,898</td><td>1.91%</td><td>51.4:1</td></tr>
-<tr><td>Test</td><td>150,382</td><td>3,017</td><td>147,365</td><td>2.01%</td><td>48.8:1</td></tr>
+<tr><td>Train</td><td>184,765</td><td>4,373</td><td>180,392</td><td>2.37%</td><td>41.2:1</td></tr>
+<tr><td>Validation</td><td>40,335</td><td>1,005</td><td>39,330</td><td>2.49%</td><td>39.1:1</td></tr>
+<tr><td>Test</td><td>38,918</td><td>924</td><td>37,994</td><td>2.37%</td><td>41.1:1</td></tr>
 </table>
 <h3>w12_h6 — Early warning: 6-hour advance prediction</h3>
 <table>
 <tr><th>Split</th><th>Sequences</th><th>Positive</th><th>Negative</th><th>+Rate</th><th>Imbalance</th></tr>
-<tr><td>Train</td><td>615,848</td><td>13,089</td><td>602,759</td><td>2.13%</td><td>46.0:1</td></tr>
-<tr><td>Validation</td><td>130,823</td><td>2,585</td><td>128,238</td><td>1.98%</td><td>49.6:1</td></tr>
-<tr><td>Test</td><td>133,352</td><td>2,841</td><td>130,511</td><td>2.13%</td><td>45.9:1</td></tr>
+<tr><td>Train</td><td>163,786</td><td>4,091</td><td>159,695</td><td>2.50%</td><td>39.0:1</td></tr>
+<tr><td>Validation</td><td>35,808</td><td>946</td><td>34,862</td><td>2.64%</td><td>36.9:1</td></tr>
+<tr><td>Test</td><td>34,404</td><td>857</td><td>33,547</td><td>2.49%</td><td>39.1:1</td></tr>
 </table>
 
 

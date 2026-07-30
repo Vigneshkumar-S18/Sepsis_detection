@@ -5,82 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THAARU Sepsis AI — Deep Learning Evaluation Report</title>
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #fafafa; color: #1f2937; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
-        h1 { color: #0f766e; font-size: 26px; border-bottom: 3px solid #0f766e; padding-bottom: 10px; margin-top: 0; }
-        h2 { color: #0f766e; font-size: 18px; margin-top: 30px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
-        .meta { color: #6b7280; font-size: 14px; margin-bottom: 25px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
-        th, td { text-align: left; padding: 10px; border: 1px solid #cbd5e1; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1 { color: #0f766e; font-size: 28px; border-bottom: 3px solid #0f766e; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #0f766e; font-size: 20px; margin-top: 30px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
+        .meta { color: #475569; font-style: italic; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { text-align: left; padding: 12px; border: 1px solid #cbd5e1; }
         th { background: #0f766e; color: white; }
-        tr:nth-child(even) { background: #f9fafb; }
-        .highlight { font-weight: bold; color: #0f766e; }
+        tr:nth-child(even) { background: #f1f5f9; }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>THAARU Sepsis AI — Deep Learning Evaluation Report</h1>
-    <div class="meta">Date: July 19, 2026 | Author: Advanced Agentic Coding Subagent</div>
+    <div class="meta">Generated: July 28, 2026</div>
 
     <h2>1. Executive Summary</h2>
-    <p>This report documents Phase 7: Deep Temporal Learning Framework benchmarks across sequential neural networks compared against classical tabular tree-based baselines.</p>
+    <p>This report documents Phase 7: Deep Temporal Learning benchmarks across sequential neural networks compared against our classical tree-based baselines.</p>
 
-    <h2>2. Model Complexity and Disk Sizes</h2>
+    <h2>2. Deep Learning Leaderboard</h2>
     <table>
-        <tr><th>Architecture</th><th>Trainable Parameters</th><th>Size on Disk (MB)</th></tr>
-        <tr><td>LSTM</td><td>74,561</td><td>0.2885 MB</td></tr>
-<tr><td>GRU</td><td>55,937</td><td>0.2173 MB</td></tr>
-<tr><td>BiLSTM</td><td>181,889</td><td>0.7000 MB</td></tr>
-<tr><td>Transformer</td><td>73,153</td><td>0.3146 MB</td></tr>
+        <tr><th>Model</th><th>Config ID</th><th>Window</th><th>Horizon</th><th>AUROC</th><th>AUPRC</th><th>F1-Score</th><th>Recall (Sens)</th><th>Specificity</th><th>Parameters</th></tr>
+        <tr><td>LSTM</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.7450</td><td>0.0970</td><td>0.1446</td><td>0.3221</td><td>0.9257</td><td>150,337</td></tr>
+<tr><td>GRU</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.7764</td><td>0.0947</td><td>0.1422</td><td>0.4381</td><td>0.8880</td><td>112,769</td></tr>
+<tr><td>BiLSTM</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.7931</td><td>0.0951</td><td>0.1351</td><td>0.5391</td><td>0.8472</td><td>333,441</td></tr>
+<tr><td>Transformer</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.7888</td><td>0.0987</td><td>0.1029</td><td>0.7106</td><td>0.7129</td><td>92,097</td></tr>
+<tr><td>GRU (Selected)</td><td>w6_h0</td><td>6h</td><td>0h</td><td>0.7675</td><td>0.0828</td><td>0.1066</td><td>0.5665</td><td>0.7884</td><td>112,769</td></tr>
+<tr><td>GRU (Selected)</td><td>w24_h0</td><td>24h</td><td>0h</td><td>0.7922</td><td>0.1157</td><td>0.1551</td><td>0.5480</td><td>0.8398</td><td>112,769</td></tr>
+<tr><td>GRU (Selected)</td><td>w12_h3</td><td>12h</td><td>+3h</td><td>0.7528</td><td>0.0852</td><td>0.1368</td><td>0.4881</td><td>0.8627</td><td>112,769</td></tr>
+<tr><td>GRU (Selected)</td><td>w12_h6</td><td>12h</td><td>+6h</td><td>0.7722</td><td>0.1018</td><td>0.1299</td><td>0.5204</td><td>0.8341</td><td>112,769</td></tr>
+<tr><td>BiLSTM (Final)</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.7899</td><td>0.1238</td><td>0.1288</td><td>0.5669</td><td>0.8284</td><td>333,441</td></tr>
+<tr><td>BiLSTM (Final)</td><td>w6_h0</td><td>6h</td><td>0h</td><td>0.7898</td><td>0.0936</td><td>0.1144</td><td>0.6268</td><td>0.7821</td><td>333,441</td></tr>
+<tr><td>BiLSTM (Final)</td><td>w24_h0</td><td>24h</td><td>0h</td><td>0.7667</td><td>0.1040</td><td>0.1590</td><td>0.4899</td><td>0.8643</td><td>333,441</td></tr>
+<tr><td>BiLSTM (Final)</td><td>w12_h3</td><td>12h</td><td>+3h</td><td>0.7666</td><td>0.0951</td><td>0.1130</td><td>0.5833</td><td>0.7875</td><td>333,441</td></tr>
+<tr><td>BiLSTM (Final)</td><td>w12_h6</td><td>12h</td><td>+6h</td><td>0.7529</td><td>0.0795</td><td>0.1780</td><td>0.2847</td><td>0.9511</td><td>333,441</td></tr>
 
     </table>
 
-    <h2>3. Computational and Inference Efficiency</h2>
-    <table>
-        <tr><th>Architecture</th><th>Batch Inference Time (ms)</th><th>Sample Inference Time (µs)</th><th>Training Time per Epoch</th></tr>
-        <tr><td>LSTM</td><td>30.07 ms</td><td>29.37 µs</td><td>10.4s</td></tr>
-<tr><td>GRU</td><td>56.08 ms</td><td>54.76 µs</td><td>11.8s</td></tr>
-<tr><td>BiLSTM</td><td>62.26 ms</td><td>60.80 µs</td><td>24.0s</td></tr>
-<tr><td>Transformer</td><td>27.44 ms</td><td>26.80 µs</td><td>31.0s</td></tr>
-
-    </table>
-
-    <h2>4. Phase 7A — Model Development Leaderboard (20% Sample)</h2>
-    <table>
-        <tr><th>Model</th><th>Config ID</th><th>Window</th><th>Horizon</th><th>Test AUROC</th><th>Test AUPRC</th><th>F1-Score</th><th>Recall</th><th>Specificity</th></tr>
-        <tr><td>LSTM</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.8384</td><td>0.1125</td><td>0.1204</td><td>0.7150</td><td>0.8014</td></tr>
-<tr><td>GRU</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.8519</td><td>0.1431</td><td>0.1192</td><td>0.7668</td><td>0.7831</td></tr>
-<tr><td>BiLSTM</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.8459</td><td>0.1320</td><td>0.1124</td><td>0.7640</td><td>0.7686</td></tr>
-<tr><td>Transformer</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.8504</td><td>0.1192</td><td>0.1301</td><td>0.7259</td><td>0.8156</td></tr>
-
-    </table>
-
-    <h2>5. Phase 7B — Final Retraining Leaderboard (50% CPU Optimized)</h2>
-    <table>
-        <tr><th>Model</th><th>Config ID</th><th>Window</th><th>Horizon</th><th>Test AUROC</th><th>Test AUPRC</th><th>F1-Score</th><th>Recall</th><th>Specificity</th></tr>
-        <tr><td>BiLSTM (Final)</td><td>w12_h0</td><td>12h</td><td>0h</td><td>0.8435</td><td>0.1228</td><td>0.1108</td><td>0.7848</td><td>0.7580</td></tr>
-<tr><td>BiLSTM (Final)</td><td>w6_h0</td><td>6h</td><td>0h</td><td>0.8393</td><td>0.1212</td><td>0.1115</td><td>0.7486</td><td>0.7783</td></tr>
-<tr><td>BiLSTM (Final)</td><td>w24_h0</td><td>24h</td><td>0h</td><td>0.8460</td><td>0.1457</td><td>0.1255</td><td>0.8175</td><td>0.7110</td></tr>
-<tr><td>BiLSTM (Final)</td><td>w12_h3</td><td>12h</td><td>+3h</td><td>0.8238</td><td>0.1119</td><td>0.1122</td><td>0.7305</td><td>0.7688</td></tr>
-<tr><td>BiLSTM (Final)</td><td>w12_h6</td><td>12h</td><td>+6h</td><td>0.8186</td><td>0.1041</td><td>0.1116</td><td>0.7494</td><td>0.7458</td></tr>
-
-    </table>
-
-    <h2>6. Deep Learning vs XGBoost Tabular Baseline</h2>
-    <table>
-        <tr><th>Model</th><th>Training Sample</th><th>Test AUROC</th><th>Test AUPRC</th><th>Test Recall</th></tr>
-        <tr><td>XGBoost (Phase 6 Classical Baseline)</td><td>100% Tabular</td><td>0.8381</td><td>0.1318</td><td>0.5898</td></tr>
-        <tr class="highlight"><td>BiLSTM (Phase 7 Final Winner)</td><td>50% Sequences</td><td>0.8435</td><td>0.1228</td><td>0.7848</td></tr>
-    </table>
-    <p><b>Conclusion:</b> The BiLSTM achieved a higher AUROC and substantially improved recall compared with the strongest classical baseline, while XGBoost maintained a higher AUPRC. This suggests a trade-off between identifying a larger proportion of septic patients and maintaining precision under severe class imbalance.</p>
-
-    <h2>7. Statistical Variability Study</h2>
-    <p>To establish robust confidence bounds for model evaluations, we retrained the top performing BiLSTM model on the primary configuration w12_h0 across 3 random seeds (42, 100, 2026) using the 50% representative sample size:</p>
+    <h2>3. Comparative Findings</h2>
     <ul>
-        <li><b>Test AUROC:</b> 0.8406 ± 0.0036</li>
-        <li><b>Test AUPRC:</b> 0.1300 ± 0.0130</li>
+        <li><b>Attention vs Recurrence:</b> The Transformer model captures global context over sequence history via parallel multi-head attention, whereas BiLSTMs track recurrences.</li>
+        <li><b>Comparison ceiling:</b> High-performance benchmarks directly evaluate deep learning against XGBoost classical baselines.</li>
     </ul>
-    <p>These tight standard deviations confirm that the sequential network's performance is stable and reproducible under variation in random weight initialization and DataLoader shuffling.</p>
 </div>
 </body>
 </html>

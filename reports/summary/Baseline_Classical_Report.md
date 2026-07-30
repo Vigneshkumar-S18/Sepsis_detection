@@ -1,5 +1,5 @@
 # THAARU Sepsis AI — Classical Baselines Report
-**Generated:** July 19, 2026
+**Generated:** July 28, 2026
 
 ---
 
@@ -10,16 +10,16 @@ This report summarizes performance evaluation of 5 classical machine learning al
 
 | Model | Dataset | AUROC | AUPRC | F1-Score | Recall (Sens) | Specificity | Training Time |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Xgboost | Dataset B | 0.8381 | 0.1318 | 0.1278 | 0.6495 | 0.8449 | 8.12s |
-| Random Forest | Dataset B | 0.8253 | 0.1162 | 0.1198 | 0.6593 | 0.8296 | 34.03s |
-| Lightgbm | Dataset B | 0.8252 | 0.1136 | 0.1131 | 0.6898 | 0.8085 | 5.80s |
-| Xgboost | Dataset A | 0.8233 | 0.1103 | 0.1222 | 0.6295 | 0.8420 | 6.11s |
-| Random Forest | Dataset A | 0.8233 | 0.1060 | 0.1239 | 0.6237 | 0.8460 | 22.24s |
-| Decision Tree | Dataset A | 0.7631 | 0.0976 | 0.0823 | 0.6800 | 0.7294 | 11.14s |
-| Decision Tree | Dataset B | 0.7607 | 0.0956 | 0.0865 | 0.6927 | 0.7388 | 23.15s |
-| Lightgbm | Dataset A | 0.8112 | 0.0956 | 0.1030 | 0.6593 | 0.7968 | 3.38s |
-| Logistic Regression | Dataset B | 0.7988 | 0.0879 | 0.0969 | 0.6862 | 0.7726 | 17.84s |
-| Logistic Regression | Dataset A | 0.7796 | 0.0823 | 0.0910 | 0.6688 | 0.7625 | 10.42s |
+| Logistic Regression | Dataset A | 0.7644 | 0.0903 | 0.1082 | 0.5884 | 0.7958 | 15.85s |
+| Logistic Regression | Dataset B | 0.7644 | 0.0903 | 0.1082 | 0.5884 | 0.7958 | 15.35s |
+| Random Forest | Dataset A | 0.7759 | 0.0874 | 0.1614 | 0.3636 | 0.9310 | 10.87s |
+| Random Forest | Dataset B | 0.7759 | 0.0874 | 0.1614 | 0.3636 | 0.9310 | 9.98s |
+| Xgboost | Dataset A | 0.7421 | 0.0853 | 0.1275 | 0.3483 | 0.9096 | 10.79s |
+| Xgboost | Dataset B | 0.7421 | 0.0853 | 0.1275 | 0.3483 | 0.9096 | 8.84s |
+| Lightgbm | Dataset A | 0.7447 | 0.0792 | 0.1269 | 0.4238 | 0.8844 | 8.36s |
+| Lightgbm | Dataset B | 0.7447 | 0.0792 | 0.1269 | 0.4238 | 0.8844 | 7.26s |
+| Decision Tree | Dataset A | 0.6674 | 0.0591 | 0.0893 | 0.4931 | 0.7901 | 22.36s |
+| Decision Tree | Dataset B | 0.6674 | 0.0591 | 0.0893 | 0.4931 | 0.7901 | 20.64s |
 
 ## 3. Core Insights & Research Answers
 * **Research Question 1: Impact of engineered features:** Dataset B (97 features) outperforms Dataset A across all metrics. For instance, tree-based models show improved AUPRC due to rolling physiological statistics.
