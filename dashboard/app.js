@@ -248,7 +248,8 @@ function submitUploadedFile() {
 // --- PROCESS FILE (EXCEL / CSV / PSV) ---
 function processAndEvaluateFile(file) {
     const fileName = file.name;
-    const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+    const lowerName = fileName.toLowerCase();
+    const isExcel = lowerName.endsWith('.xlsx') || lowerName.endsWith('.xls');
 
     if (isExcel) {
         // Use SheetJS to read binary Excel workbook
@@ -275,6 +276,7 @@ function processAndEvaluateFile(file) {
         reader.readAsText(file);
     }
 }
+
 
 // --- EVALUATE DATASET IN BILSTM CHAMPION MODEL ---
 async function evaluateDatasetContent(fileContent, filename = "Uploaded_Dataset") {
@@ -402,17 +404,23 @@ function renderEvaluationResults(res) {
     // 4. Update Explainability Chart
     updateXAIChart(res.top_features);
 
-    // 5. Update Quick Pills
+    // 5. Update Quick Pills safely
     const vMap = res.vitals_timeline || {};
-    if (vMap.HR && vMap.HR.length) document.getElementById('pill-hr').innerText = `${vMap.HR[vMap.HR.length - 1].toFixed(0)} bpm`;
-    if (vMap.MAP && vMap.MAP.length) document.getElementById('pill-map').innerText = `${vMap.MAP[vMap.MAP.length - 1].toFixed(0)} mmHg`;
-    if (vMap.Resp && vMap.Resp.length) document.getElementById('pill-resp').innerText = `${vMap.Resp[vMap.Resp.length - 1].toFixed(0)} rpm`;
-    if (vMap.Temp && vMap.Temp.length) document.getElementById('pill-temp').innerText = `${vMap.Temp[vMap.Temp.length - 1].toFixed(1)} °C`;
+    const setElemText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    };
+    
+    if (vMap.HR && vMap.HR.length) setElemText('pill-hr', `${vMap.HR[vMap.HR.length - 1].toFixed(0)} bpm`);
+    if (vMap.MAP && vMap.MAP.length) setElemText('pill-map', `${vMap.MAP[vMap.MAP.length - 1].toFixed(0)} mmHg`);
+    if (vMap.Resp && vMap.Resp.length) setElemText('pill-resp', `${vMap.Resp[vMap.Resp.length - 1].toFixed(0)} rpm`);
+    if (vMap.Temp && vMap.Temp.length) setElemText('pill-temp', `${vMap.Temp[vMap.Temp.length - 1].toFixed(1)} °C`);
     
     const spo2Val = (vMap.SpO2 && vMap.SpO2.length) ? vMap.SpO2[vMap.SpO2.length - 1] : ((vMap.O2Sat && vMap.O2Sat.length) ? vMap.O2Sat[vMap.O2Sat.length - 1] : null);
-    if (spo2Val !== null && spo2Val !== undefined) document.getElementById('pill-spo2').innerText = `${spo2Val.toFixed(0)}%`;
-    if (vMap.WBC && vMap.WBC.length) document.getElementById('pill-wbc').innerText = `${vMap.WBC[vMap.WBC.length - 1].toFixed(1)} k/µL`;
-    if (vMap.Lactate && vMap.Lactate.length) document.getElementById('pill-lactate').innerText = `${vMap.Lactate[vMap.Lactate.length - 1].toFixed(1)} mmol/L`;
+    if (spo2Val !== null && spo2Val !== undefined) setElemText('pill-spo2', `${spo2Val.toFixed(0)}%`);
+    if (vMap.WBC && vMap.WBC.length) setElemText('pill-wbc', `${vMap.WBC[vMap.WBC.length - 1].toFixed(1)} k/µL`);
+    if (vMap.Lactate && vMap.Lactate.length) setElemText('pill-lactate', `${vMap.Lactate[vMap.Lactate.length - 1].toFixed(1)} mmol/L`);
+
 
     // 6. Update Decision Support Panel
     updateAlertBanner(res.final_risk, res.recommendations);
