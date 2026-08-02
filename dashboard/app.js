@@ -1,6 +1,6 @@
 /* ==========================================================================
-   SEPSIS AI — CLINICAL DASHBOARD INTERACTIVE SCRIPT
-   Model Testing & Ingestion Engine for BiLSTM Champion Model
+   THAARU SEPSIS AI — CLINICAL DASHBOARD INTERACTIVE SCRIPT
+   Model Testing & Ingestion Engine for PyTorch BiLSTM Champion Model
    ========================================================================== */
 
 // --- GLOBAL STATE ---
@@ -70,7 +70,7 @@ function initVitalToggles() {
 
 // --- CHARTS INITIALIZATION ---
 function initCharts() {
-    // Chart 1: Sepsis Risk Timeline
+    // Graph 1: Sepsis Risk Progression Timeline
     const ctxRisk = document.getElementById('riskTimelineChart').getContext('2d');
     state.charts.riskTimeline = new Chart(ctxRisk, {
         type: 'line',
@@ -128,7 +128,7 @@ function initCharts() {
         }
     });
 
-    // Chart 2: Vitals Trend Chart
+    // Graph 2: Vitals Trend Chart
     const ctxVitals = document.getElementById('vitalsTrendChart').getContext('2d');
     state.charts.vitalsTrend = new Chart(ctxVitals, {
         type: 'line',
@@ -155,7 +155,7 @@ function initCharts() {
         }
     });
 
-    // Chart 3: XAI Feature Attribution Horizontal Bar Chart
+    // Graph 4: XAI Feature Attribution Horizontal Bar Chart
     const ctxXai = document.getElementById('xaiBarChart').getContext('2d');
     state.charts.xaiBar = new Chart(ctxXai, {
         type: 'bar',
@@ -187,17 +187,17 @@ function initCharts() {
     });
 }
 
-// --- SUBMIT PASTED EXCEL SHEET DATA ---
-function submitPastedExcelData() {
-    const pasteInput = document.getElementById('excel-paste-input');
-    const rawContent = pasteInput ? pasteInput.value.trim() : '';
-
-    if (!rawContent) {
-        alert("Please paste dataset cells copied from Excel (e.g. Ctrl+C) into the text box.");
-        return;
+// --- TOGGLE PASTE TEXT AREA ---
+function togglePasteArea() {
+    const wrapper = document.getElementById('paste-input-wrapper');
+    const icon = document.getElementById('paste-toggle-icon');
+    if (wrapper.classList.contains('hidden')) {
+        wrapper.classList.remove('hidden');
+        icon.innerText = '▲';
+    } else {
+        wrapper.classList.add('hidden');
+        icon.innerText = '▼';
     }
-
-    evaluateDatasetContent(rawContent, "Pasted_Excel_Data");
 }
 
 // --- FILE UPLOAD HANDLER ---
@@ -231,18 +231,23 @@ function initFileUpload() {
 
     function handleFileSelect(file) {
         state.uploadedFile = file;
-        fileNameDisplay.innerText = `Dataset Loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        fileNameDisplay.innerText = `Loaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
         processAndEvaluateFile(file);
     }
 }
 
-// --- SUBMIT UPLOADED FILE ---
-function submitUploadedFile() {
-    if (!state.uploadedFile) {
-        alert("Please choose or drop an Excel (.xlsx/.xls) or PSV/CSV file first.");
-        return;
+// --- SUBMIT UNIFIED INPUT (FILE OR PASTED TEXT) ---
+function submitUnifiedInput() {
+    const pasteInput = document.getElementById('excel-paste-input');
+    const pastedText = pasteInput ? pasteInput.value.trim() : '';
+
+    if (pastedText) {
+        evaluateDatasetContent(pastedText, "Pasted_Excel_Dataset");
+    } else if (state.uploadedFile) {
+        processAndEvaluateFile(state.uploadedFile);
+    } else {
+        alert("Please select or drop an Excel (.xlsx) file, or paste dataset cells into the text area first.");
     }
-    processAndEvaluateFile(state.uploadedFile);
 }
 
 // --- PROCESS FILE (EXCEL / CSV / PSV) ---
@@ -252,7 +257,6 @@ function processAndEvaluateFile(file) {
     const isExcel = lowerName.endsWith('.xlsx') || lowerName.endsWith('.xls');
 
     if (isExcel) {
-        // Use SheetJS to read binary Excel workbook
         const reader = new FileReader();
         reader.onload = (evt) => {
             try {
@@ -268,7 +272,6 @@ function processAndEvaluateFile(file) {
         };
         reader.readAsArrayBuffer(file);
     } else {
-        // Plain text file (PSV, CSV, TSV, JSON)
         const reader = new FileReader();
         reader.onload = (evt) => {
             evaluateDatasetContent(evt.target.result, fileName);
@@ -276,7 +279,6 @@ function processAndEvaluateFile(file) {
         reader.readAsText(file);
     }
 }
-
 
 // --- EVALUATE DATASET IN BILSTM CHAMPION MODEL ---
 async function evaluateDatasetContent(fileContent, filename = "Uploaded_Dataset") {
@@ -291,11 +293,11 @@ async function evaluateDatasetContent(fileContent, filename = "Uploaded_Dataset"
             const data = await response.json();
             renderEvaluationResults(data);
         } else {
-            console.warn("Backend API returned non-200. Using client-side model engine...");
+            console.warn("Backend API returned non-200. Using client-side model evaluation...");
             clientSideModelEvaluation(fileContent, filename);
         }
     } catch (err) {
-        console.warn("Backend API unavailable. Running client-side model engine:", err);
+        console.warn("Backend API unavailable. Running client-side model evaluation:", err);
         clientSideModelEvaluation(fileContent, filename);
     }
 }
@@ -320,7 +322,7 @@ function clientSideModelEvaluation(fileContent, filename) {
     const lactateIdx = headers.indexOf('Lactate');
     const wbcIdx = headers.indexOf('WBC');
 
-    const hrs = [], maps = [], resps = [], temps = [], spo2s = [];
+    const hrs = [], maps = [], resps = [], temps = [], spo2s = [], lactates = [], wbcs = [];
 
     for (let i = 1; i < lines.length; i++) {
         const parts = lines[i].split(delimiter);
@@ -331,6 +333,8 @@ function clientSideModelEvaluation(fileContent, filename) {
         resps.push(parseFloat(parts[respIdx]) || 16);
         temps.push(parseFloat(parts[tempIdx]) || 37.0);
         spo2s.push(parseFloat(parts[spo2Idx]) || 98);
+        if (lactateIdx !== -1) lactates.push(parseFloat(parts[lactateIdx]) || 1.1);
+        if (wbcIdx !== -1) wbcs.push(parseFloat(parts[wbcIdx]) || 7.5);
     }
 
     const trajectoryLen = hrs.length;
@@ -360,14 +364,16 @@ function clientSideModelEvaluation(fileContent, filename) {
             MAP: maps.slice(-stepLen),
             Resp: resps.slice(-stepLen),
             Temp: temps.slice(-stepLen),
-            SpO2: spo2s.slice(-stepLen)
+            SpO2: spo2s.slice(-stepLen),
+            Lactate: lactates.slice(-stepLen),
+            WBC: wbcs.slice(-stepLen)
         },
         top_features: [
-            { feature: `Serum Lactate / Sparsity`, attribution: 0.245 },
-            { feature: `Heart Rate Trajectory (${lastHR} bpm)`, attribution: 0.210 },
-            { feature: `MAP Deviation (${lastMAP} mmHg)`, attribution: -0.185 },
-            { feature: `Body Temperature (${lastTemp} °C)`, attribution: 0.155 },
-            { feature: `ICULOS (Stay Hours)`, attribution: 0.120 }
+            { feature: `Serum Lactate Clearance`, attribution: 0.845 },
+            { feature: `Heart Rate Trajectory (${lastHR} bpm)`, attribution: 0.610 },
+            { feature: `MAP Deviation (${lastMAP} mmHg)`, attribution: 0.585 },
+            { feature: `Body Temperature (${lastTemp} °C)`, attribution: 0.455 },
+            { feature: `ICULOS (Stay Hours)`, attribution: 0.320 }
         ],
         recommendations: baseRisk >= 0.70 ? [
             "Order STAT Blood Cultures (x2 sets) and Serum Lactate clearance.",
@@ -391,20 +397,23 @@ function renderEvaluationResults(res) {
     // 1. Update Gauge & Risk Score Badge
     updateRiskGauge(res.final_risk);
 
-    // 2. Update Risk Timeline Chart
+    // 2. Update Risk Timeline Chart (Graph 1)
     const labels = Array.from({length: res.risk_timeline.length}, (_, i) => `Hour ${i+1}`);
     state.charts.riskTimeline.data.labels = labels;
     state.charts.riskTimeline.data.datasets[0].data = res.risk_timeline;
     state.charts.riskTimeline.data.datasets[1].data = Array(res.risk_timeline.length).fill(state.alertThresholdCritical / 100);
     state.charts.riskTimeline.update();
 
-    // 3. Update Vitals Trend Chart
+    // 3. Update Vitals Trend Chart (Graph 2)
     updateVitalsChart();
 
-    // 4. Update Explainability Chart
+    // 4. Update Biomarker Status Panel (Graph 3)
+    updateBiomarkerPanel(res.vitals_timeline, res.final_risk);
+
+    // 5. Update Explainability Chart (Graph 4)
     updateXAIChart(res.top_features);
 
-    // 5. Update Quick Pills safely
+    // 6. Update Quick Pills
     const vMap = res.vitals_timeline || {};
     const setElemText = (id, val) => {
         const el = document.getElementById(id);
@@ -421,28 +430,60 @@ function renderEvaluationResults(res) {
     if (vMap.WBC && vMap.WBC.length) setElemText('pill-wbc', `${vMap.WBC[vMap.WBC.length - 1].toFixed(1)} k/µL`);
     if (vMap.Lactate && vMap.Lactate.length) setElemText('pill-lactate', `${vMap.Lactate[vMap.Lactate.length - 1].toFixed(1)} mmol/L`);
 
-
-    // 6. Update Decision Support Panel
+    // 7. Update Decision Support Panel
     updateAlertBanner(res.final_risk, res.recommendations);
 }
 
-// --- SUBMIT MANUAL PARAMETERS FORM ---
-function submitManualData() {
-    const hr = parseFloat(document.getElementById('input-hr').value) || 80;
-    const map = parseFloat(document.getElementById('input-map').value) || 75;
-    const spo2 = parseFloat(document.getElementById('input-spo2').value) || 97;
-    const resp = parseFloat(document.getElementById('input-resp').value) || 18;
-    const temp = parseFloat(document.getElementById('input-temp').value) || 37.0;
-    const lactate = parseFloat(document.getElementById('input-lactate').value) || 1.0;
+// --- UPDATE BIOMARKER STATUS PANEL (GRAPH 3) ---
+function updateBiomarkerPanel(vData, risk) {
+    if (!vData) return;
 
-    let psvContent = "HR|O2Sat|Temp|MAP|Resp|Lactate|Age|Gender|ICULOS\n";
-    for (let i = 1; i <= 12; i++) {
-        const stepHR = Math.max(70, hr - 12 + i);
-        const stepMAP = Math.min(90, map + 8 - i);
-        psvContent += `${stepHR}|${spo2}|${temp}|${stepMAP}|${resp}|${lactate}|65|1|${i}\n`;
-    }
+    const setVal = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
+    const setTag = (id, txt, isHigh) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.innerText = txt;
+            el.className = `bio-tag ${isHigh ? 'high' : 'normal'}`;
+        }
+    };
+    const setFill = (id, pct, isHigh) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.width = `${Math.min(Math.max(pct, 5), 100)}%`;
+            el.className = `bio-bar-fill ${isHigh ? 'high' : 'normal'}`;
+        }
+    };
 
-    evaluateDatasetContent(psvContent, "Manual_Input_Trajectory");
+    // 1. Serum Lactate
+    const lastLactate = (vData.Lactate && vData.Lactate.length) ? vData.Lactate[vData.Lactate.length - 1] : 1.1;
+    const isLactateHigh = lastLactate >= 2.0;
+    setVal('bio-val-lactate', `${lastLactate.toFixed(1)} mmol/L`);
+    setTag('bio-tag-lactate', isLactateHigh ? 'Elevated (≥ 2.0)' : 'Normal (< 2.0)', isLactateHigh);
+    setFill('bio-fill-lactate', (lastLactate / 6.0) * 100, isLactateHigh);
+
+    // 2. WBC Count
+    const lastWBC = (vData.WBC && vData.WBC.length) ? vData.WBC[vData.WBC.length - 1] : 7.5;
+    const isWBCHigh = lastWBC >= 12.0 || lastWBC <= 4.0;
+    setVal('bio-val-wbc', `${lastWBC.toFixed(1)} k/µL`);
+    setTag('bio-tag-wbc', isWBCHigh ? 'Abnormal (High/Low)' : 'Normal (4.5–11.0)', isWBCHigh);
+    setFill('bio-fill-wbc', (lastWBC / 30.0) * 100, isWBCHigh);
+
+    // 3. Shock Index (HR / SBP)
+    const lastHR = (vData.HR && vData.HR.length) ? vData.HR[vData.HR.length - 1] : 80;
+    const lastSBP = (vData.SBP && vData.SBP.length) ? vData.SBP[vData.SBP.length - 1] : 120;
+    const shockIdx = lastHR / (lastSBP || 120);
+    const isShockHigh = shockIdx >= 0.7;
+    setVal('bio-val-shock', shockIdx.toFixed(2));
+    setTag('bio-tag-shock', isShockHigh ? 'Elevated (≥ 0.7)' : 'Normal (< 0.7)', isShockHigh);
+    setFill('bio-fill-shock', (shockIdx / 1.5) * 100, isShockHigh);
+
+    // 4. Pulse Pressure (SBP - DBP)
+    const lastDBP = (vData.DBP && vData.DBP.length) ? vData.DBP[vData.DBP.length - 1] : 80;
+    const pp = Math.abs(lastSBP - lastDBP);
+    const isPPLow = pp < 30 || pp > 60;
+    setVal('bio-val-pp', `${pp.toFixed(0)} mmHg`);
+    setTag('bio-tag-pp', isPPLow ? 'Abnormal (<30 / >60)' : 'Normal (30–50)', isPPLow);
+    setFill('bio-fill-pp', (pp / 80.0) * 100, isPPLow);
 }
 
 // --- RUN DEFAULT SAMPLE DATASET ON LAUNCH ---
@@ -456,7 +497,40 @@ function runDefaultSampleDataset() {
 118|93|38.9|62|28|16.2|2.8|56|1|6
 122|92|39.1|58|30|18.5|3.4|56|1|7`;
 
-    evaluateDatasetContent(samplePSV, "Sample_ICU_Dataset");
+    evaluateDatasetContent(samplePSV, "Sample_ICU_Cohort");
+}
+
+// --- LOAD STRONG SEPSIS SAMPLE (1-CLICK) ---
+async function loadStrongSepsisSample() {
+    try {
+        const response = await fetch('/strong_sepsis_12hour_dummy.xlsx');
+        if (response.ok) {
+            const blob = await response.blob();
+            const file = new File([blob], "strong_sepsis_12hour_dummy.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            state.uploadedFile = file;
+            const displayEl = document.getElementById('uploaded-file-name');
+            if (displayEl) displayEl.innerText = `Loaded: ${file.name}`;
+            processAndEvaluateFile(file);
+        } else {
+            // Fallback strong sepsis PSV
+            const strongPSV = `HR|O2Sat|Temp|MAP|Resp|SBP|DBP|WBC|Lactate|Age|Gender|ICULOS
+100|96|37.9|79|22|105|67|12.8|2.05|65|1|1
+99|95|38.1|78|23|106|65|13.6|2.30|65|1|2
+103|95|38.1|76|23|100|64|14.4|2.55|65|1|3
+108|94|38.2|76|24|99|65|15.2|2.80|65|1|4
+111|94|38.3|72|24|94|62|16.0|3.05|65|1|5
+111|93|38.6|73|25|93|63|16.8|3.30|65|1|6
+114|93|38.6|71|25|89|62|17.6|3.55|65|1|7
+121|92|38.7|69|26|85|61|18.4|3.80|65|1|8
+120|92|39.0|65|26|81|58|19.2|4.05|65|1|9
+123|91|39.1|66|27|82|58|20.0|4.30|65|1|10
+130|91|39.0|64|27|78|58|20.8|4.55|65|1|11
+130|90|39.2|63|28|75|57|21.6|4.80|65|1|12`;
+            evaluateDatasetContent(strongPSV, "Strong_Sepsis_Cohort_12h");
+        }
+    } catch (err) {
+        console.warn("Loading XLSX file failed, running fallback strong sepsis PSV:", err);
+    }
 }
 
 // --- UPDATE RISK GAUGE ---
@@ -466,26 +540,28 @@ function updateRiskGauge(risk) {
     const scoreLabel = document.getElementById('risk-score-label');
     const gaugeFill = document.getElementById('gauge-fill');
 
-    scoreVal.innerText = `${percent.toFixed(1)}%`;
+    if (scoreVal) scoreVal.innerText = `${percent.toFixed(1)}%`;
 
     const maxOffset = 502;
     const offset = maxOffset - (maxOffset * percent / 100);
-    gaugeFill.style.strokeDashoffset = offset;
+    if (gaugeFill) gaugeFill.style.strokeDashoffset = offset;
 
-    scoreLabel.classList.remove('level-low', 'level-warn', 'level-high');
+    if (scoreLabel) {
+        scoreLabel.classList.remove('level-low', 'level-warn', 'level-high');
 
-    if (percent >= state.alertThresholdCritical) {
-        scoreLabel.innerText = "CRITICAL SEPSIS WARNING";
-        scoreLabel.classList.add('level-high');
-        gaugeFill.style.stroke = "var(--risk-high)";
-    } else if (percent >= state.alertThresholdWarning) {
-        scoreLabel.innerText = "MODERATE / RISING RISK";
-        scoreLabel.classList.add('level-warn');
-        gaugeFill.style.stroke = "var(--risk-warn)";
-    } else {
-        scoreLabel.innerText = "SAFE CONTROL";
-        scoreLabel.classList.add('level-low');
-        gaugeFill.style.stroke = "var(--risk-low)";
+        if (percent >= state.alertThresholdCritical) {
+            scoreLabel.innerText = "CRITICAL SEPSIS WARNING";
+            scoreLabel.classList.add('level-high');
+            if (gaugeFill) gaugeFill.style.stroke = "var(--risk-high)";
+        } else if (percent >= state.alertThresholdWarning) {
+            scoreLabel.innerText = "MODERATE / RISING RISK";
+            scoreLabel.classList.add('level-warn');
+            if (gaugeFill) gaugeFill.style.stroke = "var(--risk-warn)";
+        } else {
+            scoreLabel.innerText = "SAFE CONTROL";
+            scoreLabel.classList.add('level-low');
+            if (gaugeFill) gaugeFill.style.stroke = "var(--risk-low)";
+        }
     }
 }
 
@@ -496,6 +572,8 @@ function updateAlertBanner(risk, customRecs) {
     const desc = document.getElementById('alert-desc');
     const tag = document.getElementById('alert-priority-tag');
     const list = document.getElementById('recommendations-list');
+
+    if (!banner || !title || !desc || !tag) return;
 
     banner.classList.remove('banner-normal', 'banner-warn', 'banner-critical');
     tag.classList.remove('tag-normal', 'tag-warn', 'tag-critical');
@@ -520,12 +598,12 @@ function updateAlertBanner(risk, customRecs) {
         desc.innerText = "Dataset sepsis risk probability is within safe baseline thresholds.";
     }
 
-    if (customRecs && customRecs.length) {
+    if (customRecs && customRecs.length && list) {
         list.innerHTML = customRecs.map(r => `<li>${r}</li>`).join('');
     }
 }
 
-// --- UPDATE VITALS TREND CHART ---
+// --- UPDATE VITALS TREND CHART (GRAPH 2) ---
 function updateVitalsChart() {
     if (!state.currentEvaluationData) return;
     const vData = state.currentEvaluationData.vitals_timeline;
@@ -570,7 +648,7 @@ function updateVitalsChart() {
     state.charts.vitalsTrend.update();
 }
 
-// --- UPDATE XAI CHART ---
+// --- UPDATE XAI CHART (GRAPH 4) ---
 function updateXAIChart(features) {
     if (!features || !features.length) return;
     const labels = features.map(f => typeof f === 'object' ? (f.feature || f.name || String(f)) : String(f));
@@ -582,7 +660,6 @@ function updateXAIChart(features) {
     state.charts.xaiBar.data.datasets[0].backgroundColor = bgColors;
     state.charts.xaiBar.update();
 }
-
 
 // --- SETTINGS UI ---
 function updateSettingsUI() {

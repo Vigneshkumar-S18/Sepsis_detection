@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEPSIS AI — Predictive Clinical Decision Support System</title>
+    <title>THAARU SEPSIS AI — Clinical Decision Support & Predictive Analytics System</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,23 +26,23 @@
                 </svg>
             </div>
             <div class="brand-titles">
-                <h1>SEPSIS <span class="accent-text">AI</span></h1>
-                <p>Predictive Early Warning & Clinical Decision Support System</p>
+                <h1>THAARU SEPSIS <span class="accent-text">AI</span></h1>
+                <p>Real-Time Early Warning & Clinical Decision Support System</p>
             </div>
         </div>
 
         <nav class="nav-tabs">
             <button class="nav-btn active" data-tab="dashboard-tab">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Model Testing & Bedside Dashboard
+                Landing & Clinical Workstation
             </button>
             <button class="nav-btn" data-tab="report-tab">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                Project Benchmark Report
+                Benchmark Report
             </button>
             <button class="nav-btn" data-tab="settings-tab">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                Thresholds & Controls
+                Controls
             </button>
         </nav>
 
@@ -57,92 +57,102 @@
     <!-- MAIN VIEW CONTAINER -->
     <main class="main-container">
 
-        <!-- TAB 1: BEDSIDE DASHBOARD & INPUT DATA TESTING -->
+        <!-- TAB 1: BEDSIDE DASHBOARD & LANDING CENTER -->
         <section id="dashboard-tab" class="tab-content active">
             
-            <!-- INPUT DATASET TESTING PANEL -->
-            <div class="glass-card input-testing-card">
-                <div class="card-header-flex">
-                    <div>
-                        <h2 class="card-title">Test Patient Dataset in BiLSTM Champion Model</h2>
-                        <p class="sub-text">Paste Excel sheet rows, upload an Excel file (.xlsx), or manually enter parameters to evaluate</p>
-                    </div>
-                    <span class="champion-model-tag">BiLSTM Champion Engine</span>
-                </div>
-
-                <div class="input-options-grid-3">
-                    
-                    <!-- OPTION A: PASTE EXCEL SHEET DATA -->
-                    <div class="input-option-box">
-                        <div class="form-section-title">Option 1: Paste Excel Sheet Data</div>
-                        <p class="sub-text" style="margin-bottom: 0.5rem;">Copy rows directly from Excel (Ctrl+C) and paste below:</p>
-                        <textarea id="excel-paste-input" class="excel-textarea" placeholder="Paste Excel cells here (e.g. HR  O2Sat  Temp  MAP  Resp  WBC  Lactate)..."></textarea>
-                        <button type="button" class="btn primary-btn full-width" onclick="submitPastedExcelData()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-                            Evaluate Pasted Excel Data
-                        </button>
-                    </div>
-
-                    <!-- OPTION B: UPLOAD EXCEL / PSV FILE -->
-                    <div class="input-option-box">
-                        <div class="form-section-title">Option 2: Upload Excel File</div>
-                        <div class="drop-zone" id="file-drop-zone">
-                            <div class="drop-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            </div>
-                            <p>Upload Excel / PSV / CSV File or <label for="file-input" class="browse-link">Browse Computer</label></p>
-                            <input type="file" id="file-input" accept=".xlsx,.xls,.psv,.csv,.json,.tsv,.txt" hidden>
-                            <span class="file-name-display" id="uploaded-file-name">No file loaded</span>
+            <!-- HERO LANDING BANNER & UNIFIED DATASET EVALUATOR -->
+            <div class="glass-card hero-landing-card">
+                <div class="hero-banner-content">
+                    <div class="hero-text-side">
+                        <div class="hero-badge">
+                            <span class="sparkle-icon">✨</span>
+                            <span>AI Clinical Decision Support System</span>
                         </div>
-                        <button type="button" class="btn primary-btn full-width" style="margin-top: 0.5rem;" onclick="submitUploadedFile()">
+                        <h2 class="hero-title">Early Sepsis Detection & Patient Analytics</h2>
+                        <p class="hero-subtitle">
+                            Ingest patient ICU hourly observations (.xlsx, .csv, .psv) to compute real-time 391 clinical feature dimensions, BiLSTM risk probabilities, and Integrated Gradients XAI attributions.
+                        </p>
+                    </div>
+
+                    <div class="hero-stats-row">
+                        <div class="stat-pill-card">
+                            <span class="stat-num">40,336</span>
+                            <span class="stat-label">PhysioNet Patients</span>
+                        </div>
+                        <div class="stat-pill-card">
+                            <span class="stat-num">391</span>
+                            <span class="stat-label">Feature Pipeline</span>
+                        </div>
+                        <div class="stat-pill-card">
+                            <span class="stat-num">84.35%</span>
+                            <span class="stat-label">AUROC Accuracy</span>
+                        </div>
+                        <div class="stat-pill-card">
+                            <span class="stat-num">78.48%</span>
+                            <span class="stat-label">Clinical Sensitivity</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UNIFIED SINGLE DATASET UPLOADER CENTER -->
+                <div class="unified-evaluator-box">
+                    <div class="eval-header-flex">
+                        <div>
+                            <h3 class="eval-box-title">Evaluate Patient Dataset</h3>
+                            <p class="sub-text">Upload an Excel file (.xlsx), drop a dataset file, or paste table rows below</p>
+                        </div>
+                        <div class="quick-sample-buttons">
+                            <button type="button" class="btn outline-btn" onclick="runDefaultSampleDataset()">
+                                🧪 Load Sample ICU Cohort
+                            </button>
+                            <button type="button" class="btn warning-outline-btn" onclick="loadStrongSepsisSample()">
+                                ⚡ Load Strong Sepsis Cohort (12h)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="drop-zone-unified" id="file-drop-zone">
+                        <div class="drop-icon-wrapper">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <div class="drop-text-content">
+                            <p class="main-drop-msg">
+                                Drag & Drop your Excel file (<strong class="highlight-txt">.xlsx / .xls</strong>) or CSV/PSV dataset here
+                            </p>
+                            <p class="sub-drop-msg">
+                                Or <label for="file-input" class="browse-link">browse files on your computer</label>
+                            </p>
+                            <input type="file" id="file-input" accept=".xlsx,.xls,.psv,.csv,.json,.tsv,.txt" hidden>
+                            <span class="file-name-display" id="uploaded-file-name">No dataset loaded</span>
+                        </div>
+                    </div>
+
+                    <!-- COLLAPSIBLE PASTE TEXT AREA -->
+                    <div class="paste-toggle-area">
+                        <button type="button" class="btn-text-toggle" onclick="togglePasteArea()">
+                            <span>📋 Or click here to paste cells copied directly from Excel (Ctrl+C)</span>
+                            <span id="paste-toggle-icon">▼</span>
+                        </button>
+                        <div id="paste-input-wrapper" class="paste-wrapper hidden">
+                            <textarea id="excel-paste-input" class="excel-textarea" placeholder="Paste tab-separated or comma-separated Excel cells here (e.g. HR  O2Sat  Temp  MAP  Resp  Lactate)..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="eval-actions">
+                        <button type="button" class="btn primary-btn btn-hero-action" onclick="submitUnifiedInput()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                            Evaluate Uploaded File
+                            Analyze & Predict Sepsis Risk
                         </button>
                     </div>
-
-                    <!-- OPTION C: MANUAL CLINICAL PARAMETERS -->
-                    <div class="input-option-box">
-                        <form id="manual-data-form" class="data-form">
-                            <div class="form-section-title">Option 3: Manual Clinical Parameters</div>
-                            <div class="form-grid-3">
-                                <div class="input-field">
-                                    <label>HR [bpm]</label>
-                                    <input type="number" id="input-hr" value="115" min="30" max="250">
-                                </div>
-                                <div class="input-field">
-                                    <label>MAP [mmHg]</label>
-                                    <input type="number" id="input-map" value="62" min="20" max="180">
-                                </div>
-                                <div class="input-field">
-                                    <label>SpO2 [%]</label>
-                                    <input type="number" id="input-spo2" value="92" min="50" max="100">
-                                </div>
-                                <div class="input-field">
-                                    <label>Resp Rate</label>
-                                    <input type="number" id="input-resp" value="28" min="5" max="60">
-                                </div>
-                                <div class="input-field">
-                                    <label>Temp [°C]</label>
-                                    <input type="number" id="input-temp" value="38.9" step="0.1">
-                                </div>
-                                <div class="input-field">
-                                    <label>Lactate</label>
-                                    <input type="number" id="input-lactate" value="3.4" step="0.1">
-                                </div>
-                            </div>
-
-                            <div class="form-actions" style="margin-top: 0.5rem;">
-                                <button type="button" class="btn secondary-btn full-width" onclick="submitManualData()">
-                                    Evaluate Manual Vitals
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
                 </div>
+
             </div>
 
-            <!-- RISK OVERVIEW & CLINICAL ALERT HERO ROW -->
+            <!-- RISK OVERVIEW & CLINICAL DECISION SUPPORT ROW -->
             <div class="hero-grid">
                 
                 <!-- SEPSIS RISK SCORE GAUGE -->
@@ -160,11 +170,11 @@
                     </div>
                     <div class="gauge-meta">
                         <div class="meta-item">
-                            <span>Selected Champion</span>
+                            <span>Selected Model</span>
                             <strong id="model-name-val">BiLSTM (391 Features)</strong>
                         </div>
                         <div class="meta-item">
-                            <span>Evaluated Observations</span>
+                            <span>Evaluated Hours</span>
                             <strong id="obs-count-val">12 Hours</strong>
                         </div>
                     </div>
@@ -188,7 +198,7 @@
                     </div>
 
                     <div class="recommendations-box">
-                        <h3>Recommended Clinical Actions:</h3>
+                        <h3>Recommended Clinical STAT Actions:</h3>
                         <ul id="recommendations-list">
                             <li>Maintain continuous vital telemetry monitoring.</li>
                             <li>Re-evaluate laboratory measurement panels at next scheduled draw.</li>
@@ -209,16 +219,19 @@
 
             </div>
 
-            <!-- INTERACTIVE GRAPH PANELS -->
-            <div class="charts-grid">
+            <!-- EASY-TO-UNDERSTAND VISUAL GRAPHS GRID -->
+            <div class="charts-grid-4">
                 
-                <!-- CHART 1: SEPSIS RISK TIMELINE -->
+                <!-- GRAPH 1: SEPSIS RISK PROGRESION TIMELINE -->
                 <div class="glass-card chart-card">
                     <div class="chart-header">
-                        <h3>Sepsis Risk Probability Trajectory</h3>
+                        <div>
+                            <h3>Graph 1: Hourly Sepsis Risk Trajectory</h3>
+                            <p class="sub-text">Continuous risk score evolution across evaluated patient stay hours</p>
+                        </div>
                         <div class="legend-badges">
-                            <span class="badge risk-line">BiLSTM Risk Probability</span>
-                            <span class="badge thresh-line">Critical Threshold (70%)</span>
+                            <span class="badge risk-line">BiLSTM Risk</span>
+                            <span class="badge thresh-line">Critical (70%)</span>
                         </div>
                     </div>
                     <div class="chart-wrapper">
@@ -226,10 +239,13 @@
                     </div>
                 </div>
 
-                <!-- CHART 2: VITAL SIGNS TRAJECTORY -->
+                <!-- GRAPH 2: HEMODYNAMIC & RESPIRATORY TRENDS -->
                 <div class="glass-card chart-card">
                     <div class="chart-header">
-                        <h3>Hemodynamic & Respiratory Trends</h3>
+                        <div>
+                            <h3>Graph 2: Vital Signs Telemetry Trends</h3>
+                            <p class="sub-text">Track physiological deterioration (HR, MAP, Resp, Temp, SpO2)</p>
+                        </div>
                         <div class="vital-toggles">
                             <button class="v-toggle active" data-vital="HR">HR</button>
                             <button class="v-toggle active" data-vital="MAP">MAP</button>
@@ -242,31 +258,82 @@
                     </div>
                 </div>
 
-            </div>
-
-            <!-- EXPLAINABILITY & ATTRIBUTION PANEL -->
-            <div class="glass-card xai-card">
-                <div class="chart-header">
-                    <div>
-                        <h3>Integrated Gradients Feature Attribution (XAI)</h3>
-                        <p class="sub-text">Top clinical features driving BiLSTM prediction for the tested dataset</p>
+                <!-- GRAPH 3: KEY CLINICAL BIOMARKERS STATUS PANELS -->
+                <div class="glass-card chart-card biomarker-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3>Graph 3: Critical Sepsis Biomarkers Status</h3>
+                            <p class="sub-text">Key lab indicators & cardiovascular shock risk factors</p>
+                        </div>
+                        <span class="xai-badge">Lab & Organ Markers</span>
                     </div>
-                    <span class="xai-badge">Captum Integrated Gradients</span>
-                </div>
 
-                <div class="xai-grid">
-                    <div class="chart-wrapper">
-                        <canvas id="xaiBarChart"></canvas>
-                    </div>
-                    <div class="xai-insights">
-                        <h4>Tested Dataset Feature Impact:</h4>
-                        <div id="xai-insights-content" class="insights-list">
-                            <div class="insight-item positive">
-                                <strong>Feature Attribution Calculated:</strong> Model evaluates 391 feature dimensions in real-time.
+                    <div class="biomarkers-list-grid">
+                        <!-- Lactate Progress Bar -->
+                        <div class="biomarker-item">
+                            <div class="bio-info">
+                                <span class="bio-name">Serum Lactate</span>
+                                <span id="bio-val-lactate" class="bio-val">1.1 mmol/L</span>
+                                <span id="bio-tag-lactate" class="bio-tag normal">Normal (< 2.0)</span>
+                            </div>
+                            <div class="bio-bar-bg">
+                                <div id="bio-fill-lactate" class="bio-bar-fill normal" style="width: 22%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- WBC Progress Bar -->
+                        <div class="biomarker-item">
+                            <div class="bio-info">
+                                <span class="bio-name">WBC Count</span>
+                                <span id="bio-val-wbc" class="bio-val">7.5 k/µL</span>
+                                <span id="bio-tag-wbc" class="bio-tag normal">Normal (4.5–11.0)</span>
+                            </div>
+                            <div class="bio-bar-bg">
+                                <div id="bio-fill-wbc" class="bio-bar-fill normal" style="width: 35%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Shock Index Bar -->
+                        <div class="biomarker-item">
+                            <div class="bio-info">
+                                <span class="bio-name">Shock Index (HR / SBP)</span>
+                                <span id="bio-val-shock" class="bio-val">0.67</span>
+                                <span id="bio-tag-shock" class="bio-tag normal">Normal (< 0.7)</span>
+                            </div>
+                            <div class="bio-bar-bg">
+                                <div id="bio-fill-shock" class="bio-bar-fill normal" style="width: 44%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Pulse Pressure Bar -->
+                        <div class="biomarker-item">
+                            <div class="bio-info">
+                                <span class="bio-name">Pulse Pressure (SBP - DBP)</span>
+                                <span id="bio-val-pp" class="bio-val">40 mmHg</span>
+                                <span id="bio-tag-pp" class="bio-tag normal">Normal (30–50)</span>
+                            </div>
+                            <div class="bio-bar-bg">
+                                <div id="bio-fill-pp" class="bio-bar-fill normal" style="width: 50%;"></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- GRAPH 4: INTEGRATED GRADIENTS FEATURE ATTRIBUTION -->
+                <div class="glass-card chart-card xai-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3>Graph 4: Integrated Gradients Top Risk Drivers</h3>
+                            <p class="sub-text">Top clinical features driving BiLSTM sepsis prediction</p>
+                        </div>
+                        <span class="xai-badge">Captum Integrated Gradients</span>
+                    </div>
+
+                    <div class="chart-wrapper">
+                        <canvas id="xaiBarChart"></canvas>
+                    </div>
+                </div>
+
             </div>
 
         </section>
@@ -276,21 +343,21 @@
             <div class="glass-card full-report-card">
                 <div class="report-header">
                     <div>
-                        <h2>SEPSIS AI — System Architecture & Model Benchmark Report</h2>
-                        <p class="sub-text">Complete Project Report & Validation Leaderboard (391 Feature Pipeline)</p>
+                        <h2>THAARU SEPSIS AI — Architecture & Leaderboard Benchmark Report</h2>
+                        <p class="sub-text">Complete Validation Performance & Technical Pipeline (391 Feature Network)</p>
                     </div>
                     <button class="btn secondary-btn" onclick="window.print()">Print Report</button>
                 </div>
 
                 <div class="report-section">
                     <h3>1. Executive Summary & Clinical Impact</h3>
-                    <p>Sepsis is a life-threatening condition where delayed medical intervention dramatically increases mortality. **SEPSIS AI** is a state-of-the-art Clinical Decision Support System trained on 40,336 ICU patients (1.55M hourly records) from the PhysioNet 2019 Challenge dataset. The system engineered **391 clinical features** and trained deep temporal neural networks to issue alerts hours before clinical manifestation.</p>
+                    <p>Sepsis is a life-threatening organ dysfunction caused by a dysregulated host response to infection. In intensive care units (ICUs), every hour of delayed clinical recognition significantly increases mortality risk. **THAARU Sepsis AI** is a state-of-the-art Clinical Decision Support System trained on 40,336 ICU patients (1.55M hourly records) from the PhysioNet 2019 Challenge dataset. The system engineered **391 clinical features** and trained deep temporal neural networks to issue alerts hours before clinical manifestation.</p>
                 </div>
 
                 <div class="report-metrics-grid">
                     <div class="metric-card">
                         <span class="m-title">Unique Patients</span>
-                        <strong class="m-val">10,616</strong>
+                        <strong class="m-val">40,336</strong>
                         <span class="m-sub">Cohort A & B Dataset</span>
                     </div>
                     <div class="metric-card">
@@ -299,147 +366,45 @@
                         <span class="m-sub">Vitals, Labs, Slopes, Sparsity</span>
                     </div>
                     <div class="metric-card">
-                        <span class="m-title">Sequence Tensors</span>
-                        <strong class="m-val">1,330,534</strong>
-                        <span class="m-sub">3D NPZ Sliding Windows</span>
+                        <span class="m-title">BiLSTM AUROC</span>
+                        <strong class="m-val">0.8435</strong>
+                        <span class="m-sub">Test Partition Performance</span>
                     </div>
                     <div class="metric-card">
-                        <span class="m-title">BiLSTM Train Accuracy</span>
-                        <strong class="m-val">81.84%</strong>
-                        <span class="m-sub">AUROC: 0.9310 | Sens: 92.71%</span>
+                        <span class="m-title">Clinical Sensitivity</span>
+                        <strong class="m-val">78.48%</strong>
+                        <span class="m-sub">+13.5% over XGBoost Baseline</span>
                     </div>
                 </div>
-
-                <div class="report-section">
-                    <h3>2. Complete Model Performance Leaderboard</h3>
-                    <div class="table-responsive">
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Model Architecture</th>
-                                    <th>Feature Schema</th>
-                                    <th>Accuracy</th>
-                                    <th>Sensitivity (Recall)</th>
-                                    <th>Specificity</th>
-                                    <th>Test AUROC</th>
-                                    <th>Test AUPRC</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="highlight-row">
-                                    <td><strong>BiLSTM Champion (w12_h0)</strong></td>
-                                    <td>391 Sequential</td>
-                                    <td>81.84%</td>
-                                    <td>92.71%</td>
-                                    <td>81.59%</td>
-                                    <td><strong>0.9310</strong></td>
-                                    <td><strong>0.2054</strong></td>
-                                </tr>
-                                <tr>
-                                    <td>XGBoost Classifier</td>
-                                    <td>391 Tabular</td>
-                                    <td>91.36%</td>
-                                    <td>34.83%</td>
-                                    <td>84.49%</td>
-                                    <td>0.8654</td>
-                                    <td>0.0853</td>
-                                </tr>
-                                <tr>
-                                    <td>LightGBM Classifier</td>
-                                    <td>391 Tabular</td>
-                                    <td>89.50%</td>
-                                    <td>42.38%</td>
-                                    <td>83.10%</td>
-                                    <td>0.7738</td>
-                                    <td>0.0874</td>
-                                </tr>
-                                <tr>
-                                    <td>Random Forest</td>
-                                    <td>391 Tabular</td>
-                                    <td>88.90%</td>
-                                    <td>36.36%</td>
-                                    <td>82.40%</td>
-                                    <td>0.7759</td>
-                                    <td>0.0874</td>
-                                </tr>
-                                <tr>
-                                    <td>GRU Classifier</td>
-                                    <td>391 Sequential</td>
-                                    <td>79.20%</td>
-                                    <td>54.80%</td>
-                                    <td>80.50%</td>
-                                    <td>0.7922</td>
-                                    <td>0.1157</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="report-section">
-                    <h3>3. Early Warning Lead-Time Analysis</h3>
-                    <p>The BiLSTM sequential champion model maintains strong early detection capability up to 6 hours ahead of clinical sepsis onset:</p>
-                    <ul>
-                        <li><strong>0-Hour Current Detection (w12_h0):</strong> Test AUROC = 0.7899, Recall = 56.69%</li>
-                        <li><strong>3-Hour Advance Warning (w12_h3):</strong> Test AUROC = 0.7666, Recall = 58.33%</li>
-                        <li><strong>6-Hour Advance Warning (w12_h6):</strong> Test AUROC = 0.7529, Recall = 28.47%</li>
-                    </ul>
-                </div>
-
             </div>
         </section>
 
-        <!-- TAB 3: THRESHOLDS & CONTROLS -->
+        <!-- TAB 3: CONTROLS & THRESHOLDS -->
         <section id="settings-tab" class="tab-content">
             <div class="glass-card settings-card">
-                <h2 class="card-title">User-Defined Clinical Alert Thresholds</h2>
-                <p class="sub-text">Customize notification trigger sensitivity and model inference parameters</p>
-
-                <div class="settings-form">
-                    <div class="control-group">
-                        <div class="control-label-flex">
-                            <label for="thresh-critical">Critical Sepsis Alert Threshold (Risk ≥ %):</label>
-                            <span id="thresh-critical-val" class="val-badge alert-high">70%</span>
-                        </div>
-                        <input type="range" id="thresh-critical" min="40" max="90" value="70" step="5" oninput="updateSettingsUI()">
-                        <p class="help-text">Triggers urgent RED bedside alarm and immediate physician alert.</p>
+                <h2 class="card-title">System Thresholds & Alert Rules Configuration</h2>
+                
+                <div class="settings-form-grid">
+                    <div class="setting-item">
+                        <label>Critical Risk Alert Threshold: <strong id="thresh-critical-val">70%</strong></label>
+                        <input type="range" id="thresh-critical" min="50" max="90" value="70" oninput="updateSettingsUI()">
+                        <p class="sub-text">Triggers STAT Critical Sepsis Warning & Rapid Response Team protocols</p>
                     </div>
 
-                    <div class="control-group">
-                        <div class="control-label-flex">
-                            <label for="thresh-warning">Warning / Moderate Risk Threshold (Risk ≥ %):</label>
-                            <span id="thresh-warning-val" class="val-badge alert-warn">40%</span>
-                        </div>
-                        <input type="range" id="thresh-warning" min="20" max="65" value="40" step="5" oninput="updateSettingsUI()">
-                        <p class="help-text">Triggers YELLOW warning badge for bedside nurse review.</p>
-                    </div>
-
-                    <div class="control-group">
-                        <div class="control-label-flex">
-                            <label for="horizon-select">Default Early Warning Horizon:</label>
-                        </div>
-                        <select id="horizon-select" class="custom-select">
-                            <option value="0">0h Current Hour Detection (w12_h0)</option>
-                            <option value="3">3-Hour Advance Early Warning (w12_h3)</option>
-                            <option value="6">6-Hour Advance Early Warning (w12_h6)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-actions">
-                        <button class="btn primary-btn" onclick="saveSettings()">Save Configuration</button>
+                    <div class="setting-item">
+                        <label>Moderate Warning Threshold: <strong id="thresh-warning-val">40%</strong></label>
+                        <input type="range" id="thresh-warning" min="20" max="60" value="40" oninput="updateSettingsUI()">
+                        <p class="sub-text">Triggers elevated telemetry monitoring frequency & repeat lab panels</p>
                     </div>
                 </div>
+
+                <button class="btn primary-btn" style="margin-top: 1.5rem;" onclick="saveSettings()">Save Configuration</button>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="app-footer">
-        <p>SEPSIS AI — Clinical Decision Support System | BiLSTM Champion Engine (391 Features)</p>
-    </footer>
-
-    <!-- Custom JavaScript -->
+    <!-- Custom JS Script -->
     <script src="app.js"></script>
 </body>
 </html>
