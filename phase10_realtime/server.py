@@ -14,7 +14,7 @@ from phase10_realtime.storage.database import initialize_database
 from phase10_realtime.api.patient_routes import router as patient_router
 
 app = FastAPI(
-    title="THAARU Sepsis AI Real-Time Clinical Integration Platform",
+    title="SEPESDETECTOR Real-Time Clinical Integration Platform",
     description="Asynchronous telemetry ingestion, rolling temporal sequence building, and BiLSTM risk prediction platform.",
     version="1.0.0"
 )
@@ -57,7 +57,7 @@ async def health_check():
     """
     return {
         "status": "healthy",
-        "service": "THAARU-Sepsis-AI-Realtime-Server",
+        "service": "SEPESDETECTOR-Realtime-Server",
         "timestamp": uvicorn.__version__
     }
 
@@ -71,4 +71,4 @@ async def startup_event():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8081)

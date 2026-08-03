@@ -1,4 +1,4 @@
-# THAARU Sepsis AI — Deep Learning Evaluation Report
+# SEPESDETECTOR — Deep Learning Evaluation Report
 **Generated:** July 28, 2026
 
 ---

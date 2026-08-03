@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THAARU SEPSIS AI — CLINICAL DASHBOARD INTERACTIVE SCRIPT
+   SEPESDETECTOR — CLINICAL DASHBOARD INTERACTIVE SCRIPT
    Model Testing & Ingestion Engine for PyTorch BiLSTM Champion Model
    ========================================================================== */
 
@@ -185,6 +185,39 @@ function initCharts() {
             }
         }
     });
+
+    // Graph 5: Organ System Radar Chart
+    const ctxRadar = document.getElementById('radarChart').getContext('2d');
+    state.charts.radar = new Chart(ctxRadar, {
+        type: 'radar',
+        data: {
+            labels: ['Cardiovascular', 'Respiratory', 'Inflammatory', 'Renal', 'Hepatic'],
+            datasets: [{
+                label: 'Current Status Risk (0-1)',
+                data: [0, 0, 0, 0, 0],
+                backgroundColor: 'rgba(99, 102, 241, 0.25)', // Indigo
+                borderColor: '#6366f1',
+                pointBackgroundColor: '#8b5cf6', // Violet
+                borderWidth: 2,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                r: {
+                    min: 0,
+                    max: 1.0,
+                    ticks: { display: false, maxTicksLimit: 5 },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                    pointLabels: { color: '#94a3b8', font: { size: 12, family: 'Plus Jakarta Sans' } }
+                }
+            }
+        }
+    });
 }
 
 // --- TOGGLE PASTE TEXT AREA ---
@@ -254,7 +287,7 @@ function submitUnifiedInput() {
 function processAndEvaluateFile(file) {
     const fileName = file.name;
     const lowerName = fileName.toLowerCase();
-    const isExcel = lowerName.endsWith('.xlsx') || lowerName.endsWith('.xls');
+    const isExcel = lowerName.endsWith('.xlsx') || lowerName.endsWith('.xls') || lowerName.endsWith('.xlsv') || lowerName.endsWith('.xlsm');
 
     if (isExcel) {
         const reader = new FileReader();
@@ -280,8 +313,25 @@ function processAndEvaluateFile(file) {
     }
 }
 
+function showEvalError(msg) {
+    const errorEl = document.getElementById('eval-error-alert');
+    if (errorEl) {
+        errorEl.innerHTML = `<strong>⚠️ Dataset Validation Error:</strong> ${msg}`;
+        errorEl.classList.remove('hidden');
+    }
+}
+
+function clearEvalError() {
+    const errorEl = document.getElementById('eval-error-alert');
+    if (errorEl) {
+        errorEl.innerText = '';
+        errorEl.classList.add('hidden');
+    }
+}
+
 // --- EVALUATE DATASET IN BILSTM CHAMPION MODEL ---
 async function evaluateDatasetContent(fileContent, filename = "Uploaded_Dataset") {
+    clearEvalError();
     try {
         const response = await fetch('/api/evaluate_dataset', {
             method: 'POST',
@@ -293,8 +343,13 @@ async function evaluateDatasetContent(fileContent, filename = "Uploaded_Dataset"
             const data = await response.json();
             renderEvaluationResults(data);
         } else {
-            console.warn("Backend API returned non-200. Using client-side model evaluation...");
-            clientSideModelEvaluation(fileContent, filename);
+            const errData = await response.json().catch(() => null);
+            if (!errData || !errData.detail) {
+                // If it's a generic server error (like 404 or 501 from a static file server)
+                throw new Error(`Backend unavailable (HTTP ${response.status})`);
+            }
+            const detailMsg = errData.detail || "Invalid or unparseable dataset supplied.";
+            showEvalError(detailMsg);
         }
     } catch (err) {
         console.warn("Backend API unavailable. Running client-side model evaluation:", err);
@@ -304,29 +359,56 @@ async function evaluateDatasetContent(fileContent, filename = "Uploaded_Dataset"
 
 // --- CLIENT-SIDE MODEL EVALUATION FALLBACK ---
 function clientSideModelEvaluation(fileContent, filename) {
+    clearEvalError();
     const lines = fileContent.trim().split('\n');
-    if (lines.length < 2) return;
+    if (lines.length < 2) {
+        showEvalError("Uploaded file is empty or contains no data rows.");
+        return;
+    }
 
     let delimiter = ',';
     if (lines[0].includes('\t')) delimiter = '\t';
     else if (lines[0].includes('|')) delimiter = '|';
     else if (lines[0].includes(';')) delimiter = ';';
 
-    const headers = lines[0].split(delimiter).map(h => h.trim());
+    const rawHeaders = lines[0].split(delimiter).map(h => h.trim());
+    const normHeaders = rawHeaders.map(h => h.toUpperCase().replace(/_/g, '').replace(/ /g, ''));
 
-    const hrIdx = headers.indexOf('HR');
-    const mapIdx = headers.indexOf('MAP');
-    const respIdx = headers.indexOf('Resp');
-    const tempIdx = headers.indexOf('Temp');
-    const spo2Idx = headers.indexOf('O2Sat') !== -1 ? headers.indexOf('O2Sat') : headers.indexOf('SpO2');
-    const lactateIdx = headers.indexOf('Lactate');
-    const wbcIdx = headers.indexOf('WBC');
+    const primaryVitals = [
+        "HR", "HEARTRATE", "PULSE", "PULSERATE", "BPM",
+        "TEMP", "TEMPERATURE", "BODYTEMP", "FEVER",
+        "O2SAT", "SPO2", "SAO2", "OXYGEN", "OXYGENSATURATION", "SAT",
+        "MAP", "MEANBP", "MEANARTERIALBP", "MEANARTERIALPRESSURE",
+        "SBP", "SYSBP", "SYSTOLIC", "SYSTOLICBP",
+        "DBP", "DIABP", "DIASTOLIC", "DIASTOLICBP",
+        "RESP", "RR", "RESPIRATORYRATE", "RESPRATE", "BREATHS",
+        "WBC", "WHITEBLOODCELL", "LEUKOCYTES",
+        "LACTATE", "LACTICACID", "LAC",
+        "CREATININE", "CREAT", "CR",
+        "GLUCOSE", "GLU", "SUGAR", "BSL",
+        "PLATELETS", "PLT",
+        "BUN", "PH", "HCO3", "AGE", "GENDER", "ICULOS", "LOS", "HOUR", "HOURS"
+    ];
+    const matched = normHeaders.filter(h => primaryVitals.includes(h));
+
+    if (matched.length < 1) {
+        showEvalError(`Invalid dataset schema. The uploaded file headers [${rawHeaders.slice(0, 6).join(', ')}] do not match any recognized clinical physiological parameters (such as Temp, SpO2, Heart Rate, MAP, Resp, Glucose, Lactate, WBC, etc.). Please upload a valid ICU patient telemetry dataset.`);
+        return;
+    }
+
+    const hrIdx = normHeaders.findIndex(h => ["HR", "HEARTRATE", "PULSE"].includes(h));
+    const mapIdx = normHeaders.findIndex(h => ["MAP", "MEANBP"].includes(h));
+    const respIdx = normHeaders.findIndex(h => ["RESP", "RR", "RESPIRATORYRATE"].includes(h));
+    const tempIdx = normHeaders.findIndex(h => ["TEMP", "TEMPERATURE"].includes(h));
+    const spo2Idx = normHeaders.findIndex(h => ["O2SAT", "SPO2", "SAO2"].includes(h));
+    const lactateIdx = normHeaders.findIndex(h => ["LACTATE", "LACTICACID"].includes(h));
+    const wbcIdx = normHeaders.findIndex(h => ["WBC", "WHITEBLOODCELL"].includes(h));
 
     const hrs = [], maps = [], resps = [], temps = [], spo2s = [], lactates = [], wbcs = [];
 
     for (let i = 1; i < lines.length; i++) {
         const parts = lines[i].split(delimiter);
-        if (parts.length < headers.length) continue;
+        if (parts.length < rawHeaders.length) continue;
 
         hrs.push(parseFloat(parts[hrIdx]) || 80);
         maps.push(parseFloat(parts[mapIdx]) || 75);
@@ -413,6 +495,9 @@ function renderEvaluationResults(res) {
     // 5. Update Explainability Chart (Graph 4)
     updateXAIChart(res.top_features);
 
+    // 5.5 Update Organ Radar Chart (Graph 5)
+    updateRadarChart(res.vitals_timeline);
+
     // 6. Update Quick Pills
     const vMap = res.vitals_timeline || {};
     const setElemText = (id, val) => {
@@ -432,6 +517,66 @@ function renderEvaluationResults(res) {
 
     // 7. Update Decision Support Panel
     updateAlertBanner(res.final_risk, res.recommendations);
+
+    // 8. Generate and display Clinical Analysis Report
+    generateClinicalReport(res);
+}
+
+function generateClinicalReport(res) {
+    const container = document.getElementById('clinical-summary-report-container');
+    const content = document.getElementById('clinical-summary-content');
+    if (!container || !content) return;
+
+    const riskPct = (res.final_risk * 100).toFixed(1);
+    const date = new Date().toLocaleString();
+    const vMap = res.vitals_timeline || {};
+    
+    // Safely get the last value of an array
+    const lastVal = (arr) => {
+        if (!arr || !arr.length) return "N/A";
+        const val = arr[arr.length - 1];
+        return typeof val === 'number' ? val.toFixed(1) : val;
+    };
+    
+    const spo2Arr = (vMap.SpO2 && vMap.SpO2.length) ? vMap.SpO2 : vMap.O2Sat;
+    
+    let topFeaturesStr = (res.top_features || []).map(f => `- ${f.feature}: ${(f.attribution * 100).toFixed(1)}% influence`).join('\n');
+    let recsStr = (res.recommendations || []).map(r => `- ${r}`).join('\n');
+
+    const reportText = `PATIENT SEPSIS AI EVALUATION REPORT
+Date/Time: ${date}
+Patient ID: ${res.patient_id}
+Evaluated Timeline: ${res.observations_count} Hours
+Model: ${res.model_name}
+
+[1] RISK ASSESSMENT
+--------------------------------------------------
+Final Sepsis Probability : ${riskPct}%
+Risk Stratification      : ${res.risk_level.toUpperCase()}
+Clinical Alert Status    : ${res.alert_status || "EVALUATED"}
+
+[2] LATEST PHYSIOLOGICAL VITALS (Hour ${res.observations_count})
+--------------------------------------------------
+Heart Rate (HR)          : ${lastVal(vMap.HR)} bpm
+Mean Arterial Press (MAP): ${lastVal(vMap.MAP)} mmHg
+Respiratory Rate (Resp)  : ${lastVal(vMap.Resp)} rpm
+Temperature              : ${lastVal(vMap.Temp)} °C
+Oxygen Saturation (SpO2) : ${lastVal(spo2Arr)} %
+White Blood Cells (WBC)  : ${lastVal(vMap.WBC)} k/µL
+Serum Lactate            : ${lastVal(vMap.Lactate)} mmol/L
+
+[3] XAI FEATURE ATTRIBUTION (Top Risk Drivers)
+--------------------------------------------------
+${topFeaturesStr || "No specific drivers identified."}
+
+[4] CLINICAL DECISION SUPPORT & RECOMMENDATIONS
+--------------------------------------------------
+${recsStr || "Continue standard monitoring."}
+
+*** END OF AUTOMATED REPORT ***`;
+
+    content.textContent = reportText;
+    container.style.display = 'block';
 }
 
 // --- UPDATE BIOMARKER STATUS PANEL (GRAPH 3) ---
@@ -659,6 +804,41 @@ function updateXAIChart(features) {
     state.charts.xaiBar.data.datasets[0].data = data;
     state.charts.xaiBar.data.datasets[0].backgroundColor = bgColors;
     state.charts.xaiBar.update();
+}
+
+// --- UPDATE RADAR CHART (GRAPH 5) ---
+function updateRadarChart(vData) {
+    if (!vData || !state.charts.radar) return;
+
+    // Normalizing vitals to a 0-1 risk score for the radar chart
+    const last = (arr) => (arr && arr.length) ? arr[arr.length - 1] : null;
+
+    let cvRisk = 0;
+    let respRisk = 0;
+    let infRisk = 0;
+    let renalRisk = 0.1;
+    let hepaticRisk = state.riskScore * 0.7; // Proxy based on overall risk
+
+    const hr = last(vData.HR);
+    const map = last(vData.MAP);
+    if (hr) cvRisk = Math.max(cvRisk, hr > 110 ? 0.9 : (hr > 90 ? 0.5 : 0.1));
+    if (map) cvRisk = Math.max(cvRisk, map < 65 ? 0.95 : (map < 70 ? 0.6 : 0.1));
+
+    const resp = last(vData.Resp);
+    const spo2 = last(vData.SpO2) || last(vData.O2Sat);
+    if (resp) respRisk = Math.max(respRisk, resp > 24 ? 0.9 : (resp > 20 ? 0.5 : 0.1));
+    if (spo2) respRisk = Math.max(respRisk, spo2 < 90 ? 0.95 : (spo2 < 94 ? 0.6 : 0.1));
+
+    const temp = last(vData.Temp);
+    const wbc = last(vData.WBC);
+    if (temp) infRisk = Math.max(infRisk, (temp > 38.3 || temp < 36.0) ? 0.8 : 0.1);
+    if (wbc) infRisk = Math.max(infRisk, (wbc > 12.0 || wbc < 4.0) ? 0.8 : 0.1);
+
+    const lactate = last(vData.Lactate);
+    if (lactate) renalRisk = Math.max(renalRisk, lactate > 4.0 ? 0.9 : (lactate > 2.0 ? 0.6 : 0.1));
+
+    state.charts.radar.data.datasets[0].data = [cvRisk, respRisk, infRisk, renalRisk, hepaticRisk];
+    state.charts.radar.update();
 }
 
 // --- SETTINGS UI ---

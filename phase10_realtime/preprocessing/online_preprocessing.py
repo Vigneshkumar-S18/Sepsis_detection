@@ -40,12 +40,81 @@ class OnlinePreprocessor:
             "HospAdmTime", "ICULOS"
         ]
 
+    def normalize_column_aliases(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Normalizes common clinical feature column names (case-insensitive).
+        """
+        col_map = {}
+        for col in df.columns:
+            c_upper = str(col).strip().upper().replace("_", "").replace(" ", "").replace("-", "")
+            if c_upper in ["HR", "HEARTRATE", "PULSE", "PULSERATE", "BPM"]:
+                col_map[col] = "HR"
+            elif c_upper in ["O2SAT", "SPO2", "OXYGEN", "OXYGENSATURATION", "SAT"]:
+                col_map[col] = "O2Sat"
+            elif c_upper in ["TEMP", "TEMPERATURE", "BODYTEMP", "FEVER"]:
+                col_map[col] = "Temp"
+            elif c_upper in ["MAP", "MEANBP", "MEANARTERIALBP", "MEANARTERIALPRESSURE"]:
+                col_map[col] = "MAP"
+            elif c_upper in ["SBP", "SYSBP", "SYSTOLIC", "SYSTOLICBP"]:
+                col_map[col] = "SBP"
+            elif c_upper in ["DBP", "DIABP", "DIASTOLIC", "DIASTOLICBP"]:
+                col_map[col] = "DBP"
+            elif c_upper in ["RESP", "RR", "RESPIRATORYRATE", "RESPRATE", "BREATHS"]:
+                col_map[col] = "Resp"
+            elif c_upper in ["WBC", "WHITEBLOODCELL", "LEUKOCYTES", "LEUCOCYTES"]:
+                col_map[col] = "WBC"
+            elif c_upper in ["PLATELETS", "PLT", "PLATELETCOUNT"]:
+                col_map[col] = "Platelets"
+            elif c_upper in ["LACTATE", "LACTICACID", "LAC"]:
+                col_map[col] = "Lactate"
+            elif c_upper in ["CREATININE", "CREAT", "CR"]:
+                col_map[col] = "Creatinine"
+            elif c_upper in ["GLUCOSE", "GLU", "SUGAR", "BSL"]:
+                col_map[col] = "Glucose"
+            elif c_upper in ["BUN", "UREA"]:
+                col_map[col] = "BUN"
+            elif c_upper in ["PH"]:
+                col_map[col] = "pH"
+            elif c_upper in ["HCO3", "BICARBONATE"]:
+                col_map[col] = "HCO3"
+            elif c_upper in ["AGE"]:
+                col_map[col] = "Age"
+            elif c_upper in ["GENDER", "SEX"]:
+                col_map[col] = "Gender"
+            elif c_upper in ["ICULOS", "LOS", "HOUR", "HOURS", "TIME", "TIMESTEP"]:
+                col_map[col] = "ICULOS"
+            elif c_upper in ["PATIENTID", "PATIENT", "PID", "SUBJECTID"]:
+                col_map[col] = "PatientID"
+        return df.rename(columns=col_map)
+
+    def validate_clinical_schema(self, df: pd.DataFrame):
+        """
+        Validates that the input dataset contains legitimate clinical vital signs/lab features.
+        Raises ValueError if the dataset is unrelated or invalid.
+        """
+        df_norm = self.normalize_column_aliases(df)
+        
+        # Check matched clinical raw features
+        matched_all_raw = [c for c in self.raw_cols if c in df_norm.columns]
+        
+        # Check matched 95 model feature columns
+        matched_expected = [c for c in self.expected_features if c in df_norm.columns]
+
+        if not matched_all_raw and not matched_expected:
+            found_cols = list(df.columns[:10])
+            raise ValueError(
+                f"Invalid dataset schema. The uploaded file contains columns {found_cols}, "
+                f"which do not match any recognized clinical physiological parameters (such as Temp, SpO2/O2Sat, Heart Rate/HR, MAP, Resp, SBP, DBP, Glucose, Lactate, WBC, etc.). "
+                f"Please upload a valid ICU patient telemetry dataset."
+            )
+
     def preprocess_sequence(self, raw_df: pd.DataFrame) -> np.ndarray:
         """
         Preprocesses a single patient's stay trajectory (up to 12 rows)
         and returns a scaled 2D array of shape (k, 95).
         """
-        df_unscaled = raw_df.copy()
+        self.validate_clinical_schema(raw_df)
+        df_unscaled = self.normalize_column_aliases(raw_df.copy())
         
         # 1. Fill missing columns with NaN to ensure complete schema
         for col in self.raw_cols:

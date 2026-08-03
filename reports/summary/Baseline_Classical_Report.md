@@ -1,4 +1,4 @@
-# THAARU Sepsis AI — Classical Baselines Report
+# SEPESDETECTOR — Classical Baselines Report
 **Generated:** July 28, 2026
 
 ---

@@ -1,8 +1,8 @@
 ================================================================================
-                       THAARU SEPSIS AI — SYSTEM REPORT
+                       SEPESDETECTOR — SYSTEM REPORT
 ================================================================================
 Date: July 20, 2026
-Project Title: THAARU Sepsis AI: Early Prediction of Sepsis from Clinical Data
+Project Title: SEPESDETECTOR: Early Prediction of Sepsis from Clinical Data
 Framework Version: Phase 10 (Real-Time Ingestion & Clinician Dashboard)
 ================================================================================
 
@@ -13,7 +13,7 @@ response to infection. If not recognized and treated early (e.g., via fluids and
 intravenous antibiotics), it rapidly progresses to septic shock, multi-organ failure, 
 and death. In the ICU, every hour of delayed treatment increases mortality risk.
 
-The THAARU Sepsis AI project is a state-of-the-art Clinical Decision Support System 
+The SEPESDETECTOR project is a state-of-the-art Clinical Decision Support System 
 (CDSS) designed to predict sepsis onset hours before clinical manifestation. 
 The system consolidates and processes patient vital signs, laboratory measurements, 
 and demographic information to issue real-time early warnings, clinical suggestions, 
@@ -111,7 +111,7 @@ ROOT WORKSPACE DIRECTORY
 ├── training_setAzip.zip    - Archive containing ICU cohort A patient data (20,336 patients).
 └── training_setBzip.zip    - Archive containing ICU cohort B patient data (20,000 patients).
 
-THAARU-Sepsis-AI/ (MAIN REPOSITORY ROOT)
+SEPESDETECTOR/ (MAIN REPOSITORY ROOT)
 ├── .gitignore              - Files/folders to exclude from version control.
 ├── baseline_models.zip     - Zipped backup of classical trained baselines.
 │

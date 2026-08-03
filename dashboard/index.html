@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THAARU SEPSIS AI — Clinical Decision Support & Predictive Analytics System</title>
+    <title>SEPESDETECTOR — Clinical Decision Support & Predictive Analytics System</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +26,7 @@
                 </svg>
             </div>
             <div class="brand-titles">
-                <h1>THAARU SEPSIS <span class="accent-text">AI</span></h1>
+                <h1>SEPESDETECTOR SEPSIS <span class="accent-text">AI</span></h1>
                 <p>Real-Time Early Warning & Clinical Decision Support System</p>
             </div>
         </div>
@@ -101,14 +101,7 @@
                             <h3 class="eval-box-title">Evaluate Patient Dataset</h3>
                             <p class="sub-text">Upload an Excel file (.xlsx), drop a dataset file, or paste table rows below</p>
                         </div>
-                        <div class="quick-sample-buttons">
-                            <button type="button" class="btn outline-btn" onclick="runDefaultSampleDataset()">
-                                🧪 Load Sample ICU Cohort
-                            </button>
-                            <button type="button" class="btn warning-outline-btn" onclick="loadStrongSepsisSample()">
-                                ⚡ Load Strong Sepsis Cohort (12h)
-                            </button>
-                        </div>
+
                     </div>
 
                     <div class="drop-zone-unified" id="file-drop-zone">
@@ -126,7 +119,7 @@
                             <p class="sub-drop-msg">
                                 Or <label for="file-input" class="browse-link">browse files on your computer</label>
                             </p>
-                            <input type="file" id="file-input" accept=".xlsx,.xls,.psv,.csv,.json,.tsv,.txt" hidden>
+                            <input type="file" id="file-input" accept=".xlsx,.xls,.xlsv,.xlsm,.psv,.csv,.json,.tsv,.txt" hidden>
                             <span class="file-name-display" id="uploaded-file-name">No dataset loaded</span>
                         </div>
                     </div>
@@ -148,6 +141,9 @@
                             Analyze & Predict Sepsis Risk
                         </button>
                     </div>
+
+                    <!-- VALIDATION ERROR ALERT CONTAINER -->
+                    <div id="eval-error-alert" class="eval-error-banner hidden"></div>
                 </div>
 
             </div>
@@ -334,6 +330,34 @@
                     </div>
                 </div>
 
+                <!-- GRAPH 5: ORGAN SYSTEM RADAR -->
+                <div class="glass-card chart-card" style="grid-column: 1 / -1;">
+                    <div class="chart-header">
+                        <div>
+                            <h3>Graph 5: Organ System Health Radar</h3>
+                            <p class="sub-text">Current physiological state mapped across major organ systems (Cardiovascular, Respiratory, etc.)</p>
+                        </div>
+                        <span class="xai-badge">Multi-Organ Status</span>
+                    </div>
+                    <div class="chart-wrapper" style="height: 350px;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CLINICAL SUMMARY REPORT -->
+            <div class="glass-card full-report-card" id="clinical-summary-report-container" style="display: none; margin-top: 2rem;">
+                <div class="report-header">
+                    <div>
+                        <h2>Complete Clinical Analysis Report</h2>
+                        <p class="sub-text">Generated Sepsis Evaluation Summary for Doctor Review</p>
+                    </div>
+                    <button class="btn secondary-btn" onclick="window.print()">Print Report</button>
+                </div>
+                <div class="report-section" id="clinical-summary-content" style="white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.6;">
+                    <!-- Javascript will populate this -->
+                </div>
             </div>
 
         </section>
@@ -343,7 +367,7 @@
             <div class="glass-card full-report-card">
                 <div class="report-header">
                     <div>
-                        <h2>THAARU SEPSIS AI — Architecture & Leaderboard Benchmark Report</h2>
+                        <h2>SEPESDETECTOR — Architecture & Leaderboard Benchmark Report</h2>
                         <p class="sub-text">Complete Validation Performance & Technical Pipeline (391 Feature Network)</p>
                     </div>
                     <button class="btn secondary-btn" onclick="window.print()">Print Report</button>
@@ -351,7 +375,7 @@
 
                 <div class="report-section">
                     <h3>1. Executive Summary & Clinical Impact</h3>
-                    <p>Sepsis is a life-threatening organ dysfunction caused by a dysregulated host response to infection. In intensive care units (ICUs), every hour of delayed clinical recognition significantly increases mortality risk. **THAARU Sepsis AI** is a state-of-the-art Clinical Decision Support System trained on 40,336 ICU patients (1.55M hourly records) from the PhysioNet 2019 Challenge dataset. The system engineered **391 clinical features** and trained deep temporal neural networks to issue alerts hours before clinical manifestation.</p>
+                    <p>Sepsis is a life-threatening organ dysfunction caused by a dysregulated host response to infection. In intensive care units (ICUs), every hour of delayed clinical recognition significantly increases mortality risk. **SEPESDETECTOR** is a state-of-the-art Clinical Decision Support System trained on 40,336 ICU patients (1.55M hourly records) from the PhysioNet 2019 Challenge dataset. The system engineered **391 clinical features** and trained deep temporal neural networks to issue alerts hours before clinical manifestation.</p>
                 </div>
 
                 <div class="report-metrics-grid">

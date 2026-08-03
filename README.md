@@ -1,4 +1,4 @@
-# 🏥 THAARU Sepsis AI: Early Sepsis Prediction System
+# 🏥 SEPESDETECTOR: Early Sepsis Prediction System
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg)](https://pytorch.org/)
@@ -14,7 +14,7 @@
 
 Sepsis is a life-threatening organ dysfunction caused by a dysregulated host response to infection. In intensive care units (ICUs), every hour of delayed clinical recognition significantly increases mortality risk. 
 
-**THAARU Sepsis AI** is designed to continuously ingest patient vital sign streams, lab results, and temporal trajectories to predict sepsis onset **hours before clinical manifestation**. The system provides real-time early warnings, risk certainty metrics, persistent danger alerts, localized feature attributions (Integrated Gradients), and an interactive glassmorphic clinician workstation.
+**SEPESDETECTOR** is designed to continuously ingest patient vital sign streams, lab results, and temporal trajectories to predict sepsis onset **hours before clinical manifestation**. The system provides real-time early warnings, risk certainty metrics, persistent danger alerts, localized feature attributions (Integrated Gradients), and an interactive glassmorphic clinician workstation.
 
 ### 📊 Dataset Overview (PhysioNet Challenge 2019)
 * **Cohort Size**: 40,336 unique ICU patients (20,336 Cohort A + 20,000 Cohort B)
@@ -113,7 +113,7 @@ The framework operates end-to-end from bedside telemetry ingestion to live clini
 ## 📂 Repository Structure
 
 ```text
-THAARU-Sepsis-AI/
+SEPESDETECTOR/
 ├── dashboard/                   # Glassmorphic Clinician Workstation UI
 │   ├── index.html               # Main layout (grid, chart containers, alerts)
 │   ├── styles.css               # Styling design system and animations

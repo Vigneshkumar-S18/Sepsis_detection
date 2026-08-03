@@ -365,8 +365,13 @@ async def evaluate_dataset_input(payload: DatasetPayloadModel):
     if len(df) > 24:
         df = df.iloc[-24:].copy()
         
-    # Run online preprocessing pipeline (391 features)
-    seq = online_preprocessor.preprocess_sequence(df) # shape: (k, 391)
+    # Run online preprocessing pipeline with schema validation
+    try:
+        seq = online_preprocessor.preprocess_sequence(df)
+    except ValueError as val_err:
+        raise HTTPException(status_code=400, detail=str(val_err))
+    except Exception as err:
+        raise HTTPException(status_code=400, detail=f"Preprocessing error: {str(err)}")
     
     # Run step-by-step risk trajectory calculation
     risk_timeline = []

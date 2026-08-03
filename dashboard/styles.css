@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THAARU SEPSIS AI — MODERN CLINICAL DASHBOARD STYLESHEET
+   SEPESDETECTOR — MODERN CLINICAL DASHBOARD STYLESHEET
    Aesthetics: Deep Dark Mode, Glassmorphism, HSL Accents, Responsive Grid
    ========================================================================== */
 
@@ -10,9 +10,9 @@
     --border-color: rgba(56, 189, 248, 0.15);
     --border-hover: rgba(56, 189, 248, 0.35);
 
-    --accent-teal: #14b8a6;
-    --accent-teal-glow: rgba(20, 184, 166, 0.25);
-    --accent-cyan: #38bdf8;
+    --accent-teal: #6366f1; /* Changed to Indigo for premium feel but keeping variable name to avoid breaking CSS */
+    --accent-teal-glow: rgba(99, 102, 241, 0.25);
+    --accent-cyan: #8b5cf6; /* Changed to Violet */
     --accent-emerald: #10b981;
     
     --risk-low: #10b981;
@@ -352,6 +352,17 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     color: #f1f5f9;
+}
+
+.eval-error-banner {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1.1rem;
+    margin-top: 1rem;
+    color: #fca5a5;
+    font-size: 0.85rem;
+    line-height: 1.5;
 }
 
 .quick-sample-buttons {
@@ -854,3 +865,20 @@ body {
 .settings-form-grid { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem; }
 .setting-item label { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.4rem; }
 .setting-item input[type="range"] { width: 100%; accent-color: var(--accent-teal); }
+
+/* PRINT STYLES FOR CLEAN DOCTOR REPORTS */
+@media print {
+    body { background: white !important; color: black !important; }
+    header, .hero-landing-card, .nav-tabs, button.btn {
+        display: none !important;
+    }
+    .main-container { padding: 0 !important; margin: 0 !important; }
+    .glass-card { 
+        background: none !important; 
+        box-shadow: none !important; 
+        border: 1px solid #ddd !important; 
+        page-break-inside: avoid;
+    }
+    .text-main, .card-title, .eval-box-title { color: black !important; }
+    .sub-text, .text-muted { color: #555 !important; }
+}
